@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import styles from "./Header.module.css";
 import { services } from "@/lib/site-data";
 import SearchOverlay from "./SearchOverlay";
 import GoogleTranslate from "./GoogleTranslate";
+import NavLogo from "./NavLogo";
 
 const internshipLinks = [
   { href: "/internship#curriculum", title: "Curriculum & Tracks", desc: "Red Team (VAPT) and Blue Team (SOC) learning paths." },
@@ -48,13 +48,7 @@ export default function Header() {
     <header className={styles.header} ref={headerRef}>
       <div className={styles.bar}>
         <Link href="/" className={styles.logo}>
-          <Image
-            src="/images/logo.png"
-            alt="Rynex Security Logo"
-            width={22}
-            height={22}
-            className="logoAnimated"
-          />
+          <NavLogo />
           Rynex Security
         </Link>
 
