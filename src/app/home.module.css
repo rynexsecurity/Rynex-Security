@@ -167,11 +167,16 @@
 .ctaSection {
   position: relative;
   overflow: hidden;
-  background: var(--gray-100);
-  color: var(--white);
+  /* background: var(--gray-100); */
+  background: transparent;
+  /*color: var(--white);*/
+  color: var(--gray-100);
   padding: var(--sp-10) 0;
   text-align: center;
-  border-top: 2px solid var(--ibm-blue-60);
+  border: none;
+ /* border-top: 2px solid var(--ibm-blue-60);
+  border-bottom: 1px solid var(--gray-20);*/
+
 }
 
 .ctaTitle {
@@ -182,7 +187,8 @@
 
 .ctaText {
   font-size: 1.1rem;
-  color: var(--gray-30);
+  /* color: var(--gray-30); */
+  color: var(--gray-70);
   max-width: 60ch;
   margin: 0 auto var(--sp-07);
 }

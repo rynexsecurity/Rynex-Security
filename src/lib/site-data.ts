@@ -12,12 +12,21 @@ export const primaryNav: NavLink[] = [
   { label: "Contact", href: "/contact" },
 ];
 
+
+export type ServiceHighlight = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
 export type Service = {
   slug: string;
   icon: string;
   title: string;
   shortDescription: string;
   description: string;
+  overview: string;
+  highlights: ServiceHighlight[];
 };
 
 export const services: Service[] = [
@@ -25,49 +34,238 @@ export const services: Service[] = [
     slug: "vapt",
     icon: "fa-shield-virus",
     title: "VAPT",
-    shortDescription: "Vulnerability Assessment & Penetration Testing",
+    shortDescription:
+      "Vulnerability Assessment & Penetration Testing",
     description:
       "Vulnerability Assessment & Penetration Testing. We simulate sophisticated real-world attacks to identify and remediate vulnerabilities across your entire digital ecosystem.",
+
+    overview:
+      "Our VAPT service combines automated vulnerability discovery with manual penetration testing to identify exploitable weaknesses across web applications, networks, APIs, cloud environments, and internal infrastructure.",
+
+    highlights: [
+      {
+        icon: "fa-magnifying-glass",
+        title: "Vulnerability Discovery",
+        description:
+          "Identify security weaknesses, exposed services, insecure configurations, and vulnerable components across your digital environment.",
+      },
+      {
+        icon: "fa-user-secret",
+        title: "Manual Exploitation",
+        description:
+          "Validate discovered vulnerabilities through controlled exploitation and determine their real-world technical and business impact.",
+      },
+      {
+        icon: "fa-file-shield",
+        title: "Remediation Report",
+        description:
+          "Receive prioritized findings, proof-of-concept evidence, severity ratings, and practical remediation recommendations.",
+      },
+    ],
   },
+
   {
     slug: "soc",
+    title: "SOC Monitoring",
     icon: "fa-user-secret",
-    title: "SOC",
-    shortDescription: "Security Operations Center",
+    shortDescription:
+      "Continuous monitoring and rapid security incident response.",
     description:
-      "Security Operations Center. Our elite team provides 24/7 monitoring, threat detection, and rapid incident response to ensure your business remains resilient.",
+      "Continuous monitoring and rapid response to detect and mitigate security incidents in real time.",
+
+    overview:
+      "Our SOC service provides continuous visibility into security events, suspicious activity, and potential incidents across your technology environment.",
+
+    highlights: [
+      {
+        icon: "fa-desktop",
+        title: "Continuous Monitoring",
+        description:
+          "Monitor systems, endpoints, cloud environments, and security logs for suspicious activity and emerging threats.",
+      },
+      {
+        icon: "fa-bell",
+        title: "Threat Detection",
+        description:
+          "Detect abnormal behavior, malicious indicators, policy violations, and high-risk security events.",
+      },
+      {
+        icon: "fa-bolt",
+        title: "Incident Response",
+        description:
+          "Investigate alerts, contain threats, coordinate response actions, and reduce the impact of security incidents.",
+      },
+    ],
   },
+
   {
     slug: "grc",
     icon: "fa-file-contract",
     title: "GRC",
-    shortDescription: "Governance, Risk & Compliance",
+    shortDescription:
+      "Governance, Risk & Compliance",
     description:
       "Governance, Risk & Compliance. We align your security posture with global standards and regulatory requirements, ensuring robust risk management and compliance.",
+
+    overview:
+      "Our GRC service helps organizations establish effective governance, manage cybersecurity and operational risk, and demonstrate compliance with relevant standards and regulations.",
+
+    highlights: [
+      {
+        icon: "fa-scale-balanced",
+        title: "Compliance Assessment",
+        description:
+          "Evaluate your controls against applicable regulations, contractual obligations, and security frameworks.",
+      },
+      {
+        icon: "fa-chart-line",
+        title: "Risk Management",
+        description:
+          "Identify, assess, prioritize, track, and communicate security and operational risks across the organization.",
+      },
+      {
+        icon: "fa-clipboard-check",
+        title: "Policy Development",
+        description:
+          "Develop security policies, procedures, control matrices, risk registers, and compliance improvement plans.",
+      },
+    ],
   },
+
   {
     slug: "threat-hunting",
     icon: "fa-search",
     title: "Threat Hunting",
-    shortDescription: "Proactive threat detection",
+    shortDescription:
+      "Proactive threat detection",
     description:
       "Proactive search for advanced persistent threats (APTs) lurking in your network. We find and neutralize attackers before they can execute their mission.",
+
+    overview:
+      "Our threat-hunting service proactively searches for hidden attackers, compromised accounts, malicious activity, and advanced threats that may have bypassed traditional security controls.",
+
+    highlights: [
+      {
+        icon: "fa-binoculars",
+        title: "Proactive Investigation",
+        description:
+          "Search for suspicious behavior and attacker activity before automated security tools generate an alert.",
+      },
+      {
+        icon: "fa-network-wired",
+        title: "Behavioral Analysis",
+        description:
+          "Analyze endpoint, network, identity, and cloud activity to identify anomalies and attacker techniques.",
+      },
+      {
+        icon: "fa-crosshairs",
+        title: "Threat Containment",
+        description:
+          "Validate discovered threats, determine their scope, and provide practical containment and remediation guidance.",
+      },
+    ],
   },
+
   {
     slug: "malware-analysis",
     icon: "fa-bug",
     title: "Malware Analysis",
-    shortDescription: "Deep technical malware research",
+    shortDescription:
+      "Deep technical malware research",
     description:
       "Deep technical analysis of suspicious files and payloads to understand their behavior, origin, and impact, providing you with definitive defense strategies.",
+
+    overview:
+      "Our malware-analysis service examines suspicious files, scripts, documents, executables, and payloads to determine their capabilities, behavior, persistence methods, and potential impact.",
+
+    highlights: [
+      {
+        icon: "fa-microscope",
+        title: "Static Analysis",
+        description:
+          "Inspect file structure, strings, metadata, embedded resources, and code characteristics without executing the sample.",
+      },
+      {
+        icon: "fa-code",
+        title: "Behavioral Analysis",
+        description:
+          "Observe process activity, network communication, persistence mechanisms, and system modifications in a controlled environment.",
+      },
+      {
+        icon: "fa-file-shield",
+        title: "Indicators and Defenses",
+        description:
+          "Receive indicators of compromise, technical findings, detection recommendations, and containment guidance.",
+      },
+    ],
   },
+
   {
     slug: "security-audits",
     icon: "fa-clipboard-check",
     title: "Security Audits",
-    shortDescription: "Comprehensive security maturity review",
+    shortDescription:
+      "Comprehensive security maturity review",
     description:
       "Comprehensive technical and policy audits to evaluate your organization's security maturity and provide a roadmap for continuous improvement.",
+
+    overview:
+      "Our security-audit service evaluates your technical controls, security processes, policies, governance practices, and operational readiness against established security expectations.",
+
+    highlights: [
+      {
+        icon: "fa-list-check",
+        title: "Control Assessment",
+        description:
+          "Review technical, administrative, and operational controls to identify weaknesses and implementation gaps.",
+      },
+      {
+        icon: "fa-triangle-exclamation",
+        title: "Gap Identification",
+        description:
+          "Highlight missing controls, ineffective processes, outdated policies, and areas of unacceptable security risk.",
+      },
+      {
+        icon: "fa-road",
+        title: "Improvement Roadmap",
+        description:
+          "Receive a prioritized roadmap covering immediate corrective actions and longer-term security improvements.",
+      },
+    ],
+  },
+
+  {
+    slug: "cloud-security",
+    icon: "fa-cloud",
+    title: "Cloud Security",
+    shortDescription:
+      "Protecting your data in the cloud",
+    description:
+      "Protecting your data in the cloud. We ensure your cloud infrastructure is secure and compliant with industry standards, providing you with peace of mind.",
+
+    overview:
+      "Our cloud-security service assesses cloud infrastructure, identities, permissions, configurations, workloads, storage, networking, and monitoring controls across modern cloud environments.",
+
+    highlights: [
+      {
+        icon: "fa-cloud",
+        title: "Cloud Configuration Review",
+        description:
+          "Identify insecure storage, public exposure, weak network controls, logging gaps, and dangerous configuration settings.",
+      },
+      {
+        icon: "fa-user-lock",
+        title: "Identity and Access Review",
+        description:
+          "Assess users, roles, service accounts, permissions, privileged access, and identity-management controls.",
+      },
+      {
+        icon: "fa-shield-halved",
+        title: "Cloud Hardening",
+        description:
+          "Receive prioritized recommendations to improve cloud security, compliance, monitoring, and operational resilience.",
+      },
+    ],
   },
 ];
 

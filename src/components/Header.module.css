@@ -217,4 +217,62 @@
     color: var(--gray-100);
     font-size: 1.1rem;
   }
+ 
 }
+
+/* Internship availability states */
+.disabledInternshipLink {
+  opacity: 0.55;
+  cursor: not-allowed;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Prevent the normal mega-link hover color from affecting disabled items. */
+.disabledInternshipLink:hover .megaLinkTitle,
+.disabledInternshipLink:hover .internshipTitleBlock {
+  color: var(--gray-100);
+}
+
+.enabledInternshipLink {
+  cursor: pointer;
+}
+
+/*
+ * Keep the title and status on separate lines.
+ * This deliberately does not reuse .megaLinkTitle, because that class is a
+ * horizontal flex row for service icons and titles.
+ */
+.internshipTitleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 4px;
+}
+
+.internshipItemTitle {
+  color: var(--gray-100);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.comingSoon {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  padding: 2px 7px;
+  border: 1px solid rgba(0, 114, 195, 0.35);
+  border-radius: 999px;
+  color: #0062a1;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+

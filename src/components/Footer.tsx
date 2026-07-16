@@ -2,17 +2,17 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./Footer.module.css";
 import { contactInfo } from "@/lib/site-data";
-import NetworkBackground from "./NetworkBackground";
+// import NetworkBackground from "./NetworkBackground";
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <NetworkBackground />
+      {/* <NetworkBackground /> */}
       <div className={styles.grid}>
         <div>
           <div className={styles.brand}>
             <Image
-              src="/images/logo.png"
+              src="/images/logo-transparent.png"
               alt="Rynex Security Logo"
               width={28}
               height={28}
@@ -43,6 +43,7 @@ export default function Footer() {
             <li><Link href="/">Home</Link></li>
             <li><Link href="/about">About Us</Link></li>
             <li><Link href="/services">Our Services</Link></li>
+            <li><Link href="/careers">Careers</Link></li>
             <li><Link href="/contact">Contact Us</Link></li>
             <li><Link href="/internship">Internship</Link></li>
           </ul>

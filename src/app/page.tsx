@@ -46,7 +46,7 @@ export default function Home() {
         <NetworkBackground />
         <div className={styles.heroInner}>
           <p className={styles.eyebrow}>Rynex Security</p>
-          <h1 className={styles.heroTitle}>Detect. Exploit. Secure.</h1>
+          <h1 className={styles.heroTitle}>Detect. Exploit. Secure</h1>
           <p className={styles.heroSubtitle}>
             Advanced cybersecurity solutions designed to protect, analyze, and strengthen your
             digital infrastructure against modern threats.
@@ -121,7 +121,7 @@ export default function Home() {
       </section>
 
       <section className={styles.ctaSection}>
-        <NetworkBackground />
+        {/* <NetworkBackground /> */}
         <div className={styles.sectionInner}>
           <h2 className={styles.ctaTitle}>Secure your digital future</h2>
           <p className={styles.ctaText}>
@@ -129,7 +129,7 @@ export default function Home() {
             advanced protection strategies.
           </p>
           <div className={styles.ctaActions}>
-            <Button href="/contact" variant="onDark">Get started now</Button>
+            <Button href="/contact" variant="primary">Get started now</Button>
           </div>
         </div>
       </section>

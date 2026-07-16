@@ -1,28 +1,47 @@
 import type { Metadata } from "next";
+
 import ServicesGrid from "./ServicesGrid";
 import styles from "./services.module.css";
 
 export const metadata: Metadata = {
   title: "Our Services | Rynex Security",
   description:
-    "Explore Rynex Security's professional services: VAPT, SOC monitoring, GRC compliance, threat hunting, malware analysis, and comprehensive security audits.",
+    "Explore Rynex Security's professional services, including VAPT, SOC monitoring, GRC compliance, threat hunting, malware analysis, and comprehensive security audits.",
 };
 
 export default function ServicesPage() {
   return (
     <>
-      <div className={styles.pageHeader}>
+      <section className={styles.pageHeader}>
         <div className={styles.pageHeaderInner}>
-          <h1 className={styles.pageTitle}>Our Professional Services</h1>
+          <p className={styles.pageEyebrow}>
+            Rynex Security
+          </p>
+
+          <h1 className={styles.pageTitle}>
+            Our Professional Services
+          </h1>
+
+          <p className={styles.pageDescription}>
+            Practical offensive and defensive cybersecurity services
+            designed to identify risk, improve resilience, and protect
+            critical systems.
+          </p>
         </div>
-      </div>
+      </section>
 
       <section className={styles.section}>
         <div className={styles.sectionInner}>
           <div className={styles.sectionHead}>
-            <p className={styles.sectionEyebrow}>What We Offer</p>
-            <h2 className={styles.sectionTitle}>Elite Security Solutions</h2>
+            <p className={styles.sectionEyebrow}>
+              What We Offer
+            </p>
+
+            <h2 className={styles.sectionTitle}>
+              Elite Security Solutions
+            </h2>
           </div>
+
           <ServicesGrid />
         </div>
       </section>

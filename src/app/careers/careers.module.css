@@ -1,0 +1,939 @@
+/* ======================================================
+   CAREERS PAGE — careers.module.css
+   Inherits all CSS tokens from globals.css
+   ====================================================== */
+
+/* ── Hero ────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--gray-100);
+  color: var(--white);
+  padding: var(--sp-11) 0 var(--sp-10);
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--sp-06);
+}
+
+.eyebrow {
+  font-size: 0.875rem;
+  color: var(--gray-30);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--sp-04);
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  font-weight: 300;
+  line-height: 1.08;
+  max-width: 22ch;
+  margin-bottom: var(--sp-05);
+}
+
+.heroTitle span {
+  color: var(--ibm-blue-60);
+}
+
+.heroSubtitle {
+  font-size: 1.15rem;
+  color: var(--gray-30);
+  max-width: 52ch;
+  line-height: 1.65;
+  margin-bottom: var(--sp-08);
+}
+
+.heroActions {
+  display: flex;
+  gap: var(--sp-04);
+  flex-wrap: wrap;
+}
+
+/* ── Generic sections ────────────────────────────────── */
+.section {
+  padding: var(--sp-10) 0;
+}
+
+.sectionAlt {
+  background: var(--gray-10);
+}
+
+.sectionDark {
+  background: var(--gray-100);
+  color: var(--white);
+}
+
+.sectionInner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--sp-06);
+}
+
+.sectionHead {
+  margin-bottom: var(--sp-08);
+  max-width: 60ch;
+}
+
+.sectionEyebrow {
+  color: var(--cyan-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-03);
+}
+
+.sectionEyebrowLight {
+  color: var(--ibm-blue-60);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-03);
+}
+
+.sectionTitle {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 400;
+  color: var(--gray-100);
+  margin-bottom: var(--sp-04);
+}
+
+.sectionTitleLight {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 400;
+  color: var(--white);
+  margin-bottom: var(--sp-04);
+}
+
+.sectionText {
+  font-size: 1rem;
+  color: var(--gray-70);
+  line-height: 1.6;
+}
+
+.sectionTextLight {
+  font-size: 1rem;
+  color: var(--gray-30);
+  line-height: 1.6;
+}
+
+/* ── Hiring Process ──────────────────────────────────── */
+.processNav {
+  display: flex;
+  border-bottom: 1px solid var(--gray-20);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.processNav::-webkit-scrollbar {
+  display: none;
+}
+
+.processTab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-02);
+  flex: 1;
+  min-width: 140px;
+  padding: var(--sp-05) var(--sp-06);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color var(--motion), background-color var(--motion);
+  position: relative;
+}
+
+.processTab:hover {
+  background: var(--gray-10);
+}
+
+.processTabActive {
+  border-bottom-color: var(--ibm-blue-60);
+  background: var(--ibm-blue-10);
+}
+
+.processTabNumber {
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--gray-60);
+  letter-spacing: 0.04em;
+  transition: color var(--motion);
+}
+
+.processTabActive .processTabNumber {
+  color: var(--cyan-text);
+}
+
+.processTabTitle {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gray-100);
+  line-height: 1.3;
+}
+
+.processTabIcon {
+  font-size: 1.1rem;
+  color: var(--gray-60);
+  margin-bottom: var(--sp-02);
+  transition: color var(--motion), transform var(--motion);
+}
+
+.processTabActive .processTabIcon {
+  color: var(--cyan-text);
+  transform: translateY(-2px);
+}
+
+.processContent {
+  padding: var(--sp-08) 0 var(--sp-07);
+  animation: fadeSlideIn 200ms ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.processContentInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-09);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .processContentInner {
+    grid-template-columns: 1fr;
+    gap: var(--sp-06);
+  }
+}
+
+.processStepNumber {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 300;
+  font-family: var(--font-mono);
+  color: var(--ibm-blue-60);
+  line-height: 1;
+  margin-bottom: var(--sp-04);
+  opacity: 0.35;
+}
+
+.processStepTitle {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 400;
+  color: var(--gray-100);
+  margin-bottom: var(--sp-04);
+}
+
+.processStepDesc {
+  font-size: 0.975rem;
+  color: var(--gray-70);
+  line-height: 1.7;
+  max-width: 55ch;
+}
+
+.processStepIllustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 140px;
+  border: 1px solid var(--gray-20);
+  background: var(--gray-10);
+  font-size: 3.5rem;
+  color: var(--cyan-text);
+  opacity: 0.6;
+}
+
+/* ── Why Join / Benefit cards ────────────────────────── */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--gray-20);
+}
+
+@media (max-width: 900px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  background: var(--white);
+  padding: var(--sp-07);
+  overflow: hidden;
+  transition: background-color var(--motion);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--ibm-blue-60);
+  transition: width 150ms ease-out;
+}
+
+.card:hover {
+  background: var(--gray-10);
+}
+
+.card:hover::before {
+  width: 100%;
+}
+
+.cardIcon {
+  font-size: 1.75rem;
+  color: var(--cyan-text);
+  margin-bottom: var(--sp-05);
+  transition: transform var(--motion), color var(--motion);
+}
+
+.card:hover .cardIcon {
+  transform: translateY(-2px);
+  color: var(--ibm-blue-70);
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: var(--sp-03);
+  color: var(--gray-100);
+}
+
+.cardText {
+  font-size: 0.9rem;
+  color: var(--gray-70);
+  line-height: 1.6;
+}
+
+/* ── Stories ─────────────────────────────────────────── */
+.storiesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-06);
+  margin-bottom: var(--sp-08);
+}
+
+@media (max-width: 900px) {
+  .storiesGrid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-05);
+  }
+}
+
+.storyCard {
+  background: var(--gray-90);
+  border: 1px solid var(--gray-80);
+  padding: var(--sp-07);
+  position: relative;
+  transition: border-color var(--motion), box-shadow var(--motion);
+}
+
+.storyCard:hover {
+  border-color: var(--ibm-blue-60);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.12);
+}
+
+.storyQuoteMark {
+  font-size: 4rem;
+  line-height: 0.8;
+  color: var(--ibm-blue-60);
+  font-family: Georgia, serif;
+  opacity: 0.4;
+  margin-bottom: var(--sp-04);
+  display: block;
+}
+
+.storyQuote {
+  font-size: 0.95rem;
+  color: var(--gray-30);
+  line-height: 1.7;
+  margin-bottom: var(--sp-06);
+}
+
+.storyAuthor {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-04);
+  border-top: 1px solid var(--gray-80);
+  padding-top: var(--sp-05);
+}
+
+.storyAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ibm-blue-60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-100);
+  flex-shrink: 0;
+}
+
+.storyName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.storyRole {
+  font-size: 0.78rem;
+  color: var(--gray-60);
+}
+
+.storiesActions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* ── Featured Jobs (on main careers page) ────────────── */
+.jobsPreviewGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-05);
+  margin-bottom: var(--sp-08);
+}
+
+@media (max-width: 900px) {
+  .jobsPreviewGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jobPreviewCard {
+  background: var(--white);
+  border: 1px solid var(--gray-20);
+  padding: var(--sp-06);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--motion), box-shadow var(--motion);
+  display: flex;
+  flex-direction: column;
+}
+
+.jobPreviewCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--ibm-blue-60);
+  transition: width 150ms ease-out;
+}
+
+.jobPreviewCard:hover {
+  border-color: var(--ibm-blue-60);
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.1);
+}
+
+.jobPreviewCard:hover::before {
+  width: 100%;
+}
+
+.jobMeta {
+  display: flex;
+  gap: var(--sp-03);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-04);
+}
+
+.jobTag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  background: var(--ibm-blue-10);
+  color: var(--cyan-text);
+}
+
+.jobTagType {
+  background: var(--gray-10);
+  color: var(--gray-70);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+}
+
+.jobTitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--gray-100);
+  margin-bottom: var(--sp-03);
+}
+
+.jobLocation {
+  font-size: 0.85rem;
+  color: var(--gray-60);
+  margin-bottom: var(--sp-04);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-02);
+}
+
+.jobDesc {
+  font-size: 0.875rem;
+  color: var(--gray-70);
+  line-height: 1.55;
+  flex: 1;
+  margin-bottom: var(--sp-05);
+}
+
+.jobArrow {
+  font-size: 0.85rem;
+  color: var(--cyan-text);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-02);
+  transition: gap var(--motion), color var(--motion);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.jobArrow:hover {
+  gap: var(--sp-04);
+  color: var(--ibm-blue-70);
+}
+
+/* ── Jobs page ───────────────────────────────────────── */
+.jobsHero {
+  position: relative;
+  background: var(--gray-100);
+  color: var(--white);
+  padding: var(--sp-10) 0 var(--sp-09);
+  border-bottom: 1px solid var(--gray-80);
+}
+
+.jobsHeroInner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--sp-06);
+}
+
+.jobsHeroTitle {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  margin-bottom: var(--sp-04);
+}
+
+.jobsHeroSubtitle {
+  font-size: 1rem;
+  color: var(--gray-30);
+  max-width: 55ch;
+}
+
+/* Search & Filter bar */
+.searchBar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-20);
+  padding: var(--sp-05) 0;
+  position: sticky;
+  top: 60px;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.searchBarInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--sp-06);
+  display: flex;
+  gap: var(--sp-04);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.searchInputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.searchInputWrap i {
+  position: absolute;
+  left: var(--sp-04);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-60);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: var(--sp-04) var(--sp-04) var(--sp-04) calc(var(--sp-04) + 22px);
+  border: 1px solid var(--gray-30);
+  background: var(--white);
+  color: var(--gray-100);
+  outline: none;
+  transition: border-color var(--motion);
+}
+
+.searchInput:focus {
+  border-color: var(--ibm-blue-60);
+}
+
+.filterSelect {
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: var(--sp-04) var(--sp-05);
+  border: 1px solid var(--gray-30);
+  background: var(--white);
+  color: var(--gray-100);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--motion);
+  min-width: 160px;
+}
+
+.filterSelect:focus {
+  border-color: var(--ibm-blue-60);
+}
+
+.resultsCount {
+  font-size: 0.85rem;
+  color: var(--gray-60);
+  white-space: nowrap;
+}
+
+/* Jobs list */
+.jobsSection {
+  padding: var(--sp-09) 0 var(--sp-11);
+}
+
+.jobsListInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--sp-06);
+}
+
+.jobsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--gray-20);
+  margin-bottom: var(--sp-08);
+}
+
+.jobCard {
+  background: var(--white);
+  padding: var(--sp-06) var(--sp-07);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-06);
+  align-items: center;
+  transition: background-color var(--motion);
+  position: relative;
+  overflow: hidden;
+}
+
+.jobCard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--ibm-blue-60);
+  transition: width 150ms ease-out;
+}
+
+.jobCard:hover {
+  background: var(--gray-10);
+}
+
+.jobCard:hover::before {
+  width: 3px;
+}
+
+@media (max-width: 672px) {
+  .jobCard {
+    grid-template-columns: 1fr;
+    gap: var(--sp-04);
+    padding: var(--sp-05) var(--sp-06);
+  }
+}
+
+.jobCardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-03);
+}
+
+.jobCardTitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--gray-100);
+}
+
+.jobCardMeta {
+  display: flex;
+  gap: var(--sp-03);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.jobCardDesc {
+  font-size: 0.875rem;
+  color: var(--gray-70);
+  line-height: 1.5;
+  max-width: 75ch;
+}
+
+.jobCardTags {
+  display: flex;
+  gap: var(--sp-02);
+  flex-wrap: wrap;
+}
+
+.skillTag {
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  background: var(--gray-10);
+  color: var(--gray-70);
+  border: 1px solid var(--gray-20);
+}
+
+.jobCardRight {
+  display: flex;
+  align-items: center;
+}
+
+/* No results state */
+.noResults {
+  text-align: center;
+  padding: var(--sp-11) 0;
+}
+
+.noResultsIcon {
+  font-size: 3rem;
+  color: var(--gray-30);
+  margin-bottom: var(--sp-06);
+}
+
+.noResultsTitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--gray-100);
+  margin-bottom: var(--sp-03);
+}
+
+.noResultsText {
+  font-size: 0.9rem;
+  color: var(--gray-60);
+}
+
+/* ── CTA banner ──────────────────────────────────────── */
+.ctaBanner {
+  background: var(--gray-10);
+  color: var(--gray-100);
+  padding: var(--sp-10) 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--gray-20);
+}
+
+.ctaTitle {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 400;
+  margin-bottom: var(--sp-04);
+}
+
+.ctaText {
+  font-size: 1rem;
+  color: var(--gray-70);
+  max-width: 55ch;
+  margin: 0 auto var(--sp-07);
+  line-height: 1.6;
+}
+
+.ctaActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-04);
+  flex-wrap: wrap;
+}
+
+/* ── Responsive tweaks ───────────────────────────────── */
+@media (max-width: 672px) {
+  .storiesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .jobsPreviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .searchBarInner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filterSelect {
+    min-width: 100%;
+  }
+
+  .processTab {
+    min-width: 110px;
+    padding: var(--sp-04);
+  }
+
+  .processTabTitle {
+    font-size: 0.8rem;
+  }
+}
+
+/* ── Next Steps Section ──────────────────────────────── */
+.nextStepsSection {
+  padding: var(--sp-09) 0 var(--sp-10);
+  background: var(--white);
+  border-top: 1px solid var(--gray-20);
+}
+
+.nextStepsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-10);
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .nextStepsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-08);
+  }
+}
+
+.nextStepsLeft {
+  max-width: 50ch;
+}
+
+.nextStepsTitle {
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 300;
+  color: var(--gray-100);
+  margin-bottom: var(--sp-05);
+  line-height: 1.1;
+}
+
+.nextStepsText {
+  font-size: 1rem;
+  color: var(--gray-70);
+  line-height: 1.6;
+  margin-bottom: var(--sp-06);
+}
+
+.nextStepsRight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-06);
+  padding: var(--sp-07);
+  background: var(--gray-10);
+  border: 1px solid var(--gray-20);
+}
+
+.stepBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-02);
+}
+
+.stepLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray-70);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selectWrapper i {
+  position: absolute;
+  right: var(--sp-05);
+  color: var(--gray-60);
+  pointer-events: none;
+  font-size: 0.8rem;
+}
+
+.nextStepsSelect {
+  width: 100%;
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: var(--sp-05) var(--sp-08) var(--sp-05) var(--sp-05);
+  background: var(--white);
+  border: 1px solid var(--gray-30);
+  color: var(--gray-100);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--motion), box-shadow var(--motion);
+}
+
+.nextStepsSelect:disabled {
+  background: var(--gray-20);
+  color: var(--gray-60);
+  cursor: not-allowed;
+  border-color: var(--gray-20);
+}
+
+.nextStepsSelect:focus {
+  border-color: var(--ibm-blue-60);
+  box-shadow: 0 0 0 1px var(--ibm-blue-60);
+}
+
+.nextStepsCTA {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--motion), transform var(--motion);
+  pointer-events: none;
+}
+
+.nextStepsCTAVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
