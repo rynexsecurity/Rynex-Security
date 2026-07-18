@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { comparePassword, signJWT } from '@/lib/auth';
+import { signJWT } from '@/lib/auth';
+import { comparePassword } from '@/lib/password';
 
 export async function POST(request: Request) {
   try {

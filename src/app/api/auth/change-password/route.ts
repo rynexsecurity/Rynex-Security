@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
-import { comparePassword, hashPassword, signJWT, verifyJWT } from '@/lib/auth';
+import { signJWT, verifyJWT } from '@/lib/auth';
+import { comparePassword, hashPassword } from '@/lib/password';
 
 export async function POST(request: Request) {
   try {

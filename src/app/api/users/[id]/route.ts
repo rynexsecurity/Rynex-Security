@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
-import { getSessionUser, hashPassword } from '@/lib/auth';
+import { getSessionUser } from '@/lib/auth';
+import { hashPassword } from '@/lib/password';
 import { sendConfirmationEmail } from '@/lib/mailer';
 import { buildPortalCredentialsEmail } from '@/lib/email-templates/portal-credentials';
 
