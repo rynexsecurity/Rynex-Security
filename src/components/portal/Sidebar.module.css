@@ -1,0 +1,199 @@
+.sidebar {
+  width: 260px;
+  background-color: #1a1f36;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand {
+  padding: var(--sp-06);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logoCircle {
+  width: 14px;
+  height: 14px;
+  background-color: var(--ibm-blue-60);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--ibm-blue-60);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.companyName {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.subtext {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-sans);
+}
+
+.userCard {
+  padding: var(--sp-06);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-04);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background-color: var(--cyan-text);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-01);
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.roleBadge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ceo {
+  background-color: #f6e05e;
+  color: #744210;
+}
+
+.admin {
+  background-color: #feb2b2;
+  color: #742a2a;
+}
+
+.developer {
+  background-color: #9ae6b4;
+  color: #22543d;
+}
+
+.head {
+  background-color: #e9d8fd;
+  color: #44337a;
+}
+
+.intern {
+  background-color: #bee3f8;
+  color: #2b6cb0;
+}
+
+.client {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.nav {
+  flex: 1;
+  padding: var(--sp-05) var(--sp-03);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-02);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-04);
+  padding: var(--sp-03) var(--sp-04);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  transition: all var(--motion);
+}
+
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--ibm-blue-60);
+  font-weight: 500;
+}
+
+.active .icon {
+  color: var(--ibm-blue-60);
+}
+
+.icon {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color var(--motion);
+}
+
+.footer {
+  padding: var(--sp-04) var(--sp-06);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .brand {
+    padding: var(--sp-04) var(--sp-05);
+  }
+  
+  .userCard {
+    display: none;
+  }
+  
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: var(--sp-02) var(--sp-04);
+  }
+  
+  .navLink {
+    padding: var(--sp-02) var(--sp-03);
+    font-size: 13px;
+  }
+}

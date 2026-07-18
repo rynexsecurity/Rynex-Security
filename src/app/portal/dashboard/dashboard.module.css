@@ -1,0 +1,214 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-06);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--sp-10);
+  color: var(--gray-60);
+  font-size: 16px;
+}
+
+.welcomeBanner {
+  background-color: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: 4px;
+  padding: var(--sp-06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.welcomeTitle {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--gray-100);
+  margin-bottom: var(--sp-01);
+}
+
+.welcomeSubtitle {
+  font-size: 14px;
+  color: var(--gray-60);
+}
+
+.roleBadge {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--cyan-text);
+}
+
+.timeBadge {
+  font-size: 13px;
+  color: var(--gray-70);
+  background-color: var(--gray-10);
+  padding: var(--sp-02) var(--sp-04);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-02);
+}
+
+/* --- STATS GRID --- */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--sp-05);
+}
+
+.statCard {
+  background-color: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: 4px;
+  padding: var(--sp-05);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.statIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--gray-60);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--gray-100);
+}
+
+/* --- CONTENT GRID --- */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--sp-06);
+}
+
+.feedCard,
+.infoCard {
+  background-color: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: 4px;
+  padding: var(--sp-06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-05);
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gray-100);
+  border-bottom: 1px solid var(--gray-10);
+  padding-bottom: var(--sp-03);
+}
+
+.feedList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-04);
+}
+
+.feedItem {
+  display: flex;
+  gap: var(--sp-03);
+  align-items: flex-start;
+}
+
+.feedDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.feedDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.feedText {
+  font-size: 14px;
+  color: var(--gray-90);
+  line-height: 1.4;
+}
+
+.feedTime {
+  font-size: 12px;
+  color: var(--gray-60);
+}
+
+.quickLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-03);
+}
+
+.linkButton {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-03);
+  padding: var(--sp-04);
+  background-color: var(--gray-10);
+  border: 1px solid var(--gray-20);
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-90);
+  transition: all var(--motion);
+}
+
+.linkButton:hover {
+  background-color: var(--white);
+  border-color: var(--cyan-text);
+  color: var(--cyan-text);
+}
+
+.linkButton i {
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcomeBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-03);
+  }
+  
+  .timeBadge {
+    width: 100%;
+    justify-content: center;
+  }
+}

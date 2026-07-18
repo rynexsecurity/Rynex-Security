@@ -1,0 +1,205 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CEO
+  ADMIN
+  DEVELOPER
+  HEAD
+  INTERN
+  CLIENT
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  DELIVERED
+}
+
+enum ProjectMemberRole {
+  LEAD
+  WORKER
+}
+
+enum ReportType {
+  VAPT
+  SOC
+  GRC
+  PROGRESS
+  TASK_SUBMISSION
+  GENERAL
+}
+
+enum ReportStatus {
+  DRAFT
+  SUBMITTED
+  REVIEWED
+  APPROVED
+  REJECTED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id                 String          @id @default(uuid())
+  name               String
+  email              String          @unique
+  passwordHash       String
+  role               Role            @default(INTERN)
+  teamId             String?
+  team               Team?           @relation("TeamMembers", fields: [teamId], references: [id])
+  isActive           Boolean         @default(true)
+  mustChangePassword Boolean         @default(true)
+  lastLogin          DateTime?
+  createdAt          DateTime        @default(now())
+  createdById        String?
+  creator            User?           @relation("UserCreator", fields: [createdById], references: [id])
+  createdUsers       User[]          @relation("UserCreator")
+  
+  // Relations
+  managedTeams       Team[]          @relation("TeamHead")
+  projectMemberships ProjectMember[]
+  clientProjects     Project[]       @relation("ClientProjects")
+  reports            Report[]        @relation("ReportAuthor")
+  reviewedReports    Report[]        @relation("ReportReviewer")
+  assignedTasks      Task[]          @relation("TaskAssignedTo")
+  createdTasks       Task[]          @relation("TaskCreatedBy")
+  sentMessages       Message[]       @relation("MessageSender")
+  receivedMessages   Message[]       @relation("MessageReceiver")
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+}
+
+model Team {
+  id        String    @id @default(uuid())
+  name      String
+  headId    String?
+  head      User?     @relation("TeamHead", fields: [headId], references: [id])
+  members   User[]    @relation("TeamMembers")
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id              String          @id @default(uuid())
+  title           String
+  description     String?
+  status          ProjectStatus   @default(NOT_STARTED)
+  clientId        String
+  client          User            @relation("ClientProjects", fields: [clientId], references: [id])
+  teamId          String?
+  team            Team?           @relation(fields: [teamId], references: [id])
+  startDate       DateTime?
+  deadline        DateTime?
+  progressPercent Int             @default(0)
+  createdAt       DateTime        @default(now())
+  
+  // Relations
+  members         ProjectMember[]
+  reports         Report[]
+  tasks           Task[]
+  messages        Message[]
+}
+
+model ProjectMember {
+  id        String            @id @default(uuid())
+  projectId String
+  project   Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      ProjectMemberRole @default(WORKER)
+
+  @@unique([projectId, userId])
+}
+
+model Report {
+  id             String       @id @default(uuid())
+  title          String
+  content        String?
+  fileUrl        String?
+  type           ReportType   @default(GENERAL)
+  status         ReportStatus @default(SUBMITTED)
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User         @relation("ReportAuthor", fields: [authorId], references: [id])
+  reviewedById   String?
+  reviewedBy     User?        @relation("ReportReviewer", fields: [reviewedById], references: [id])
+  reviewNote     String?
+  createdAt      DateTime     @default(now())
+}
+
+model Task {
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  status         TaskStatus   @default(TODO)
+  priority       TaskPriority @default(MEDIUM)
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedToId   String
+  assignedTo     User         @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: Cascade)
+  assignedById   String
+  assignedBy     User         @relation("TaskCreatedBy", fields: [assignedById], references: [id])
+  dueDate        DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime     @default(now())
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  threadId       String
+  senderId       String
+  sender         User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId     String
+  receiver       User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  content        String
+  attachmentUrl  String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  link      String?
+  isRead    Boolean  @default(false)
+  emailSent Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  entityType String
+  entityId   String?
+  details    String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}

@@ -6,22 +6,44 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "ts-node --project tsconfig.seed.json prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^5.22.0",
+    "@types/bcryptjs": "^2.4.6",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "gray-matter": "^4.0.3",
+    "jose": "^6.2.3",
     "mailtrap": "^4.6.1",
     "next": "^16.2.10",
     "next-mdx-remote": "^6.0.0",
+    "pg": "^8.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/bcrypt": "^6.0.0",
+    "@types/node": "^20.19.43",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }
