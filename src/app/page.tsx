@@ -53,7 +53,7 @@ export default function Home() {
           </p>
           <div className={styles.heroActions}>
             <Button href="/services">Our Services</Button>
-            <Button href="/contact" variant="onDark">Contact Us</Button>
+            <Button href="/contact" variant="onDark">Get In Touch</Button>
           </div>
         </div>
       </section>

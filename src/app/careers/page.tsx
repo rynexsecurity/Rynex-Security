@@ -47,7 +47,7 @@ export default function CareersPage() {
             real-world threats. Offensive, defensive, and governance roles available.
           </p>
           <div className={styles.heroActions}>
-            <Button href="/careers/jobs">Search Jobs</Button>
+            <Button href="/services">Our Services</Button>
             <Button href="/contact" variant="onDark">Get in Touch</Button>
           </div>
         </div>
@@ -119,12 +119,6 @@ export default function CareersPage() {
               </article>
             ))}
           </div>
-
-          <div className={styles.storiesActions}>
-            <Button href="/blog" variant="onDark">
-              Discover More Stories
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -158,10 +152,6 @@ export default function CareersPage() {
                 </Link>
               </article>
             ))}
-          </div>
-
-          <div style={{ textAlign: "center" }}>
-            <Button href="/careers/jobs">Search All Jobs</Button>
           </div>
         </div>
       </section>
