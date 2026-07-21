@@ -47,37 +47,21 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
-      {/* SUCCESS LOGIN POPUP */}
+      {/* SUCCESS LOGIN ANIMATION */}
       {showSuccessPopup && (
-        <div className={styles.popupOverlay}>
-          <div className={styles.popupCard}>
-            <div className={styles.popupLogoContainer}>
-              <div className={styles.logoPulseRing}></div>
-              <Image
-                src="/images/logo-transparent.png"
-                alt="Rynex Security"
-                width={72}
-                height={72}
-                className={styles.popupLogoImg}
-                priority
-              />
-            </div>
-            <div className={styles.accessGrantedBadge}>Access Granted</div>
-            <h2 className={styles.popupTitle}>Welcome back!</h2>
-
-            {loggedUser && (
-              <div className={styles.userInfoBox}>
-                <div className={styles.userName}>{loggedUser.name}</div>
-                <div className={styles.userRoleBadge}>{loggedUser.role} Access</div>
-                <div className={styles.userEmail}>{loggedUser.email}</div>
-              </div>
-            )}
-
-            <div className={styles.loadingProgressContainer}>
-              <div className={styles.loadingProgressBar}></div>
-            </div>
-            <div className={styles.popupStatusText}>Preparing your workspace...</div>
+        <div className={styles.fullscreenSuccessOverlay}>
+          <div className={styles.successLogoContainer}>
+            <Image
+              src="/images/logo-transparent.png"
+              alt="Rynex Security"
+              width={160}
+              height={160}
+              className={styles.successLogo}
+              priority
+            />
           </div>
+          <h2 className={styles.successWelcomeText}>Welcome, {loggedUser?.name || 'User'}</h2>
+          <div className={styles.successRoleText}>{loggedUser?.role || 'Authorized'} Access Granted</div>
         </div>
       )}
 
