@@ -140,6 +140,21 @@ export async function POST(req: NextRequest) {
       console.error("[Messages API] Email notification failed:", emailErr);
     }
 
+    // Write Audit Log
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId: session.userId,
+          action: 'SEND_MESSAGE',
+          entityType: 'Message',
+          entityId: message.id,
+          details: `Sent message to ${receiver.name} (${receiver.email})`,
+        },
+      });
+    } catch (auditErr) {
+      console.error("[Messages API] Audit log failed:", auditErr);
+    }
+
     return NextResponse.json({ message }, { status: 201 });
   } catch (error) {
     console.error("[Messages API] POST error:", error);

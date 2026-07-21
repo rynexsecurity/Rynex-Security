@@ -52,14 +52,6 @@ const internshipLinks = [
 export default function Header() {
   const pathname = usePathname();
 
-  const isPortal =
-    pathname.startsWith('/portal') ||
-    pathname === '/login' ||
-    pathname === '/change-password' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('portal'));
-
-  if (isPortal) return null;
-
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);

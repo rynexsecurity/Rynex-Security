@@ -11,6 +11,7 @@ interface DashboardStats {
   totalUsers: number;
   recentTasks: any[];
   recentReports: any[];
+  systemAlerts: any[];
 }
 
 export default function DashboardPage() {
@@ -21,6 +22,7 @@ export default function DashboardPage() {
     totalUsers: 0,
     recentTasks: [],
     recentReports: [],
+    systemAlerts: [],
   });
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<TerminalTask | null>(null);
@@ -199,6 +201,34 @@ export default function DashboardPage() {
             </a>
           </div>
         </div>
+
+        {/* System Alerts Feed */}
+        {stats.systemAlerts && stats.systemAlerts.length > 0 && (
+          <div className={styles.feedCard}>
+            <h3 className={styles.cardTitle}>System Alerts &amp; Audit Log</h3>
+            
+            <div className={styles.feedList}>
+              {stats.systemAlerts.map((alert) => (
+                <div key={alert.id} className={styles.feedItem}>
+                  <span
+                    className={styles.feedDot}
+                    style={{ backgroundColor: '#B388FF' }}
+                  ></span>
+                  <div className={styles.feedDetails}>
+                    <p className={styles.feedText}>
+                      <strong>{alert.user?.name || 'System'}:</strong> {alert.details || alert.action}
+                    </p>
+                    <span className={styles.feedTime}>
+                      {new Date(alert.createdAt).toLocaleString(undefined, {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Terminal CLI Modal */}

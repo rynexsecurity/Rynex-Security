@@ -21,6 +21,7 @@ export async function GET() {
     let totalUsers = 0;
     let recentTasks: any[] = [];
     let recentReports: any[] = [];
+    let systemAlerts: any[] = [];
 
     if (['CEO', 'ADMIN', 'DIRECTOR'].includes(role)) {
       // Full system overview
@@ -44,6 +45,14 @@ export async function GET() {
         include: {
           project: { select: { title: true } },
           author: { select: { name: true, email: true } },
+        },
+      });
+
+      systemAlerts = await db.auditLog.findMany({
+        take: 6,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: { select: { name: true, role: true } },
         },
       });
     } else if (role === 'HEAD') {
@@ -148,6 +157,7 @@ export async function GET() {
         totalUsers,
         recentTasks,
         recentReports,
+        systemAlerts,
       },
     });
   } catch (error: any) {

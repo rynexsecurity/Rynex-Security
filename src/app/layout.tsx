@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import SiteLayoutWrapper from "@/components/SiteLayoutWrapper";
+import { headers } from "next/headers";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({
@@ -28,11 +29,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const host = headersList.get("host") || "";
+  const isPortalHost = host.includes("portal");
   return (
     <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
@@ -42,7 +46,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <SiteLayoutWrapper>
+        <SiteLayoutWrapper isPortalHost={isPortalHost}>
           {children}
         </SiteLayoutWrapper>
       </body>

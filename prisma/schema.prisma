@@ -244,7 +244,7 @@ model BlogPost {
   status          BlogStatus  @default(PENDING)
   
   authorId        String
-  author          User        @relation("BlogAuthor", fields: [authorId], references: [id])
+  author          User        @relation("BlogAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
