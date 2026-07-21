@@ -2,7 +2,6 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { getSessionUser } from '@/lib/auth';
 import Sidebar from '@/components/portal/Sidebar';
-import Header from '@/components/portal/Header';
 import styles from './portal.module.css';
 import './portal.css';
 
@@ -23,7 +22,6 @@ export default async function PortalLayout({
     <div className={styles.portalWrapper}>
       <Sidebar user={session} />
       <div className={styles.mainContent}>
-        <Header user={session} />
         <main className={styles.scrollArea}>{children}</main>
       </div>
     </div>

@@ -1,0 +1,222 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 7, 15, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+}
+
+.modal {
+  background-color: #0A0D1E;
+  border: 1px solid rgba(0, 255, 153, 0.3);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 0 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 255, 153, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #0D1120;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 255, 153, 0.2);
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dotRed,
+.dotYellow,
+.dotGreen {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.dotRed { background: #FF5F56; }
+.dotYellow { background: #FFBD2E; }
+.dotGreen { background: #27C93F; }
+
+.dotRed:hover { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 95, 86, 0.7); }
+.dotYellow:hover { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 189, 46, 0.7); }
+.dotGreen:hover { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 8px rgba(39, 201, 63, 0.7); }
+
+.headerTitle {
+  font-size: 12px;
+  color: #00FF99;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #FF0055;
+}
+
+.body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: #080A15;
+}
+
+.promptBanner {
+  background: rgba(0, 255, 153, 0.05);
+  border: 1px solid rgba(0, 255, 153, 0.2);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 12px;
+  color: #00FF99;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #00E5FF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.promptSymbol {
+  color: #00FF99;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  background-color: #0A0D1E;
+  color: #F8FAFC;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.select option {
+  background-color: #0A0D1E;
+  color: #F8FAFC;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #00FF99;
+  box-shadow: 0 0 12px rgba(0, 255, 153, 0.3);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.logsOutput {
+  background: #12172A;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 11px;
+  color: #94A3B8;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logOk {
+  color: #00FF99;
+  font-weight: 700;
+}
+
+.logErr {
+  color: #FF0055;
+  font-weight: 700;
+}
+
+.errorAlert {
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid #FF0055;
+  color: #FF4D4D;
+  padding: 0.75rem;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, rgba(0, 255, 153, 0.2), rgba(0, 229, 255, 0.2));
+  color: #00FF99;
+  border: 1px solid #00FF99;
+  padding: 0.85rem;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.2);
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00FF99, #00E5FF);
+  color: #0A0D1E;
+  box-shadow: 0 0 25px rgba(0, 255, 153, 0.6);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}

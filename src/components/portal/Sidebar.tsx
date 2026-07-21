@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
 
 interface NavItem {
@@ -19,14 +19,11 @@ interface NavGroup {
 }
 
 interface SidebarProps {
-  // Option A (Legacy/New Layout)
   user?: {
     name: string;
     email: string;
     role: string;
   };
-  
-  // Option B (PortalShell)
   userName?: string;
   userRole?: string;
   navGroups?: NavGroup[];
@@ -43,13 +40,22 @@ export default function Sidebar({
   onMobileClose,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Determine actual display values based on which props were supplied
-  const name = userName || user?.name || 'User';
+  const name = userName || user?.name || 'Security User';
   const role = userRole || user?.role || 'INTERN';
-  const email = user?.email || '';
+  const email = user?.email || 'user@rynexsecurity.com';
 
-  // Helper to build default nav groups if not passed in navGroups
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Logout error:', e);
+    } finally {
+      window.location.href = '/portal/login';
+    }
+  };
+
   const buildDefaultNavGroups = (role: string): NavGroup[] => {
     const groups: NavGroup[] = [];
 
@@ -57,32 +63,32 @@ export default function Sidebar({
     groups.push({
       label: 'Overview',
       items: [
-        { href: '/portal/dashboard', icon: 'fas fa-chart-pie', label: 'Dashboard' },
+        { href: '/portal/dashboard', icon: 'fas fa-terminal', label: 'Dashboard' },
       ],
     });
 
     // Projects & Work
     const projectItems: NavItem[] = [];
 
-    if (['CEO', 'ADMIN', 'DEVELOPER'].includes(role)) {
+    if (['CEO', 'ADMIN', 'DIRECTOR'].includes(role)) {
       projectItems.push({ href: '/portal/projects', icon: 'fas fa-folder-open', label: 'All Projects' });
-    } else if (['HEAD', 'INTERN'].includes(role)) {
+    } else if (['HEAD', 'DEVELOPER', 'INTERN'].includes(role)) {
       projectItems.push({ href: '/portal/projects', icon: 'fas fa-folder-open', label: 'My Projects' });
     } else if (role === 'CLIENT') {
       projectItems.push({ href: '/portal/projects', icon: 'fas fa-folder-open', label: 'My Project' });
     }
 
     // Reports
-    if (['CEO', 'ADMIN', 'DEVELOPER'].includes(role)) {
+    if (['CEO', 'ADMIN', 'DIRECTOR'].includes(role)) {
       projectItems.push({ href: '/portal/reports', icon: 'fas fa-file-lines', label: 'All Reports' });
-    } else if (['HEAD', 'INTERN'].includes(role)) {
+    } else if (['HEAD', 'DEVELOPER', 'INTERN'].includes(role)) {
       projectItems.push({ href: '/portal/reports', icon: 'fas fa-file-lines', label: 'Reports' });
     } else if (role === 'CLIENT') {
       projectItems.push({ href: '/portal/reports', icon: 'fas fa-file-download', label: 'Deliverables' });
     }
 
     // Tasks
-    if (['CEO', 'ADMIN', 'DEVELOPER', 'HEAD', 'INTERN'].includes(role)) {
+    if (['CEO', 'ADMIN', 'DIRECTOR', 'HEAD', 'DEVELOPER', 'INTERN'].includes(role)) {
       projectItems.push({ href: '/portal/tasks', icon: 'fas fa-list-check', label: 'Tasks' });
     }
 
@@ -106,17 +112,17 @@ export default function Sidebar({
     // Management
     const mgmtItems: NavItem[] = [];
 
-    if (['CEO', 'ADMIN', 'DEVELOPER'].includes(role)) {
+    if (['CEO', 'ADMIN', 'DIRECTOR'].includes(role)) {
       mgmtItems.push({ href: '/portal/users', icon: 'fas fa-users', label: 'Users' });
     } else if (role === 'HEAD') {
       mgmtItems.push({ href: '/portal/users', icon: 'fas fa-users', label: 'My Team' });
     }
 
-    if (['CEO', 'ADMIN', 'DEVELOPER', 'HEAD'].includes(role)) {
+    if (['CEO', 'ADMIN', 'DIRECTOR', 'HEAD'].includes(role)) {
       mgmtItems.push({ href: '/portal/teams', icon: 'fas fa-people-group', label: 'Teams' });
     }
 
-    if (['CEO', 'ADMIN', 'DEVELOPER'].includes(role)) {
+    if (['CEO', 'ADMIN', 'DIRECTOR'].includes(role)) {
       mgmtItems.push({ href: '/portal/audit-log', icon: 'fas fa-scroll', label: 'Audit Log' });
     }
 
@@ -145,13 +151,13 @@ export default function Sidebar({
         <Image
           src="/images/logo-transparent.png"
           alt="Rynex Security"
-          width={24}
-          height={24}
+          width={28}
+          height={28}
           className={styles.logoImg}
         />
         <div className={styles.brandText}>
           <span className={styles.companyName}>Rynex Security</span>
-          <span className={styles.subtext}>Security Hub</span>
+          <span className={styles.subtext}>SecOps Kernel v4.1</span>
         </div>
         {onMobileClose && (
           <button onClick={onMobileClose} className={styles.mobileCloseBtn} aria-label="Close sidebar">
@@ -160,22 +166,10 @@ export default function Sidebar({
         )}
       </div>
 
-      <div className={styles.userCard}>
-        <div className={styles.avatar}>
-          {name.charAt(0).toUpperCase()}
-        </div>
-        <div className={styles.userInfo}>
-          <div className={styles.userName}>{name}</div>
-          <span className={`${styles.roleBadge} ${styles[role.toLowerCase()]}`}>
-            {role}
-          </span>
-        </div>
-      </div>
-
       <nav className={styles.nav}>
         {activeNavGroups.map((group) => (
           <div key={group.label} className={styles.navSection}>
-            <div className={styles.sectionLabel}>{group.label}</div>
+            <div className={styles.sectionLabel}>// {group.label}</div>
             <div className={styles.sectionItems}>
               {group.items.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -199,8 +193,24 @@ export default function Sidebar({
         ))}
       </nav>
 
-      <div className={styles.footer}>
-        <span>v1.0.0</span>
+      <div className={styles.sidebarFooter}>
+        <div className={styles.userCard}>
+          <div className={styles.avatar}>
+            {name.charAt(0).toUpperCase()}
+          </div>
+          <div className={styles.userInfo}>
+            <div className={styles.userName}>{name}</div>
+            <div className={styles.userEmail}>{email}</div>
+            <span className={`${styles.roleBadge} ${styles[role.toLowerCase()]}`}>
+              {role}
+            </span>
+          </div>
+        </div>
+
+        <button onClick={handleLogout} className={styles.logoutBtn} aria-label="Sign Out">
+          <i className="fas fa-power-off" aria-hidden="true"></i>
+          <span>Sign Out</span>
+        </button>
       </div>
     </aside>
   );

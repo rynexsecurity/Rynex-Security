@@ -8,7 +8,13 @@ import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname.startsWith('/portal')) return null;
+  const isPortal =
+    pathname.startsWith('/portal') ||
+    pathname === '/login' ||
+    pathname === '/change-password' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('portal'));
+
+  if (isPortal) return null;
 
   return (
     <footer className={styles.footer}>

@@ -2,192 +2,212 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './dashboard.module.css';
+import TerminalTaskModal, { TerminalTask } from '@/components/portal/TerminalTaskModal';
 
-interface UserSession {
-  name: string;
-  email: string;
-  role: string;
+interface DashboardStats {
+  totalProjects: number;
+  activeTasks: number;
+  totalReports: number;
+  totalUsers: number;
+  recentTasks: any[];
+  recentReports: any[];
 }
 
 export default function DashboardPage() {
-  const [session, setSession] = useState<UserSession | null>(null);
-  const [stats, setStats] = useState({
-    projectsCount: 0,
+  const [stats, setStats] = useState<DashboardStats>({
+    totalProjects: 0,
     activeTasks: 0,
-    pendingReports: 0,
-    usersCount: 0,
+    totalReports: 0,
+    totalUsers: 0,
+    recentTasks: [],
+    recentReports: [],
   });
   const [loading, setLoading] = useState(true);
+  const [selectedTask, setSelectedTask] = useState<TerminalTask | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // Fetch session details from cookies/headers on client side or mock it from a JWT
-    const fetchSession = async () => {
+    const loadDashboardData = async () => {
       try {
-        const res = await fetch('/api/users'); // Handled by API middleware to check session
-        if (res.ok) {
-          // Parse session information from a custom API or decode the login response
-          // For prototyping dashboard content, we can fetch session info or decode cookies
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    // Standard local fetch to get session info
-    const getSession = async () => {
-      try {
-        // Fetch current session info
-        const res = await fetch('/api/users');
-        if (res.ok) {
-          // Set session placeholder for UI demonstration based on our seeded admin
-          setSession({
-            name: 'CEO Admin',
-            email: 'ceo@rynexsecurity.com',
-            role: 'CEO',
-          });
-          setStats({
-            projectsCount: 3,
-            activeTasks: 8,
-            pendingReports: 2,
-            usersCount: 12,
-          });
+        const statsRes = await fetch('/api/portal/dashboard/stats');
+        if (statsRes.ok) {
+          const data = await statsRes.json();
+          if (data.stats) {
+            setStats(data.stats);
+          }
         }
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load dashboard:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    getSession();
+    loadDashboardData();
   }, []);
 
-  if (loading) {
-    return <div className={styles.loading}>Loading operations database...</div>;
-  }
+  const handleTaskClick = (task: any) => {
+    setSelectedTask({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      project: task.project,
+      assignedTo: task.assignedTo,
+      createdAt: task.createdAt,
+    });
+    setIsModalOpen(true);
+  };
 
-  if (!session) {
-    return <div className={styles.loading}>Loading operations database...</div>;
+  const handleStatusUpdate = async (taskId: string, newStatus: 'TODO' | 'IN_PROGRESS' | 'DONE') => {
+    setStats((prev) => ({
+      ...prev,
+      recentTasks: prev.recentTasks.map((t) =>
+        t.id === taskId ? { ...t, status: newStatus } : t
+      ),
+    }));
+  };
+
+  if (loading) {
+    return <div className={styles.loading}>Loading operations telemetry...</div>;
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.welcomeBanner}>
         <div>
-          <h1 className={styles.welcomeTitle}>Welcome back, {session.name}</h1>
+          <h1 className={styles.welcomeTitle}>Security Operations Center</h1>
           <p className={styles.welcomeSubtitle}>
-            Role: <span className={styles.roleBadge}>{session.role}</span> | Operations status: ACTIVE
+            System Overview &amp; Real-Time Database Metrics
           </p>
         </div>
         <div className={styles.timeBadge}>
-          <i className="far fa-clock" aria-hidden="true"></i> {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          <i className="far fa-clock" aria-hidden="true"></i>{' '}
+          {new Date().toLocaleDateString(undefined, {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}
         </div>
       </div>
 
       {/* --- STATISTICS WIDGETS --- */}
-      {['CEO', 'ADMIN', 'DEVELOPER'].includes(session.role) && (
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ color: '#0089ab', backgroundColor: '#e0faff' }}>
-              <i className="fas fa-project-diagram" aria-hidden="true"></i>
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statLabel}>Active Projects</span>
-              <span className={styles.statValue}>{stats.projectsCount}</span>
-            </div>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div className={styles.statIcon} style={{ color: '#00E5FF', background: 'rgba(0, 229, 255, 0.1)' }}>
+            <i className="fas fa-folder-open" aria-hidden="true"></i>
           </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ color: '#d97706', backgroundColor: '#fef3c7' }}>
-              <i className="fas fa-tasks" aria-hidden="true"></i>
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statLabel}>Pending Tasks</span>
-              <span className={styles.statValue}>{stats.activeTasks}</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ color: '#dc2626', backgroundColor: '#fee2e2' }}>
-              <i className="fas fa-file-shield" aria-hidden="true"></i>
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statLabel}>Unreviewed Reports</span>
-              <span className={styles.statValue}>{stats.pendingReports}</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ color: '#16a34a', backgroundColor: '#dcfce7' }}>
-              <i className="fas fa-users" aria-hidden="true"></i>
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statLabel}>Team Accounts</span>
-              <span className={styles.statValue}>{stats.usersCount}</span>
-            </div>
+          <div className={styles.statInfo}>
+            <span className={styles.statLabel}>Active Projects</span>
+            <span className={styles.statValue}>{stats.totalProjects}</span>
           </div>
         </div>
-      )}
+
+        <div className={styles.statCard}>
+          <div className={styles.statIcon} style={{ color: '#FF9100', background: 'rgba(255, 145, 0, 0.1)' }}>
+            <i className="fas fa-list-check" aria-hidden="true"></i>
+          </div>
+          <div className={styles.statInfo}>
+            <span className={styles.statLabel}>Active Tasks</span>
+            <span className={styles.statValue}>{stats.activeTasks}</span>
+          </div>
+        </div>
+
+        <div className={styles.statCard}>
+          <div className={styles.statIcon} style={{ color: '#00FF99', background: 'rgba(0, 255, 153, 0.1)' }}>
+            <i className="fas fa-file-shield" aria-hidden="true"></i>
+          </div>
+          <div className={styles.statInfo}>
+            <span className={styles.statLabel}>VAPT &amp; SOC Reports</span>
+            <span className={styles.statValue}>{stats.totalReports}</span>
+          </div>
+        </div>
+
+        <div className={styles.statCard}>
+          <div className={styles.statIcon} style={{ color: '#B388FF', background: 'rgba(179, 136, 255, 0.1)' }}>
+            <i className="fas fa-users" aria-hidden="true"></i>
+          </div>
+          <div className={styles.statInfo}>
+            <span className={styles.statLabel}>Active Personnel</span>
+            <span className={styles.statValue}>{stats.totalUsers}</span>
+          </div>
+        </div>
+      </div>
 
       {/* --- RECENT OPERATIONS FEED --- */}
       <div className={styles.contentGrid}>
         <div className={styles.feedCard}>
-          <h3 className={styles.cardTitle}>Recent Operations Activities</h3>
+          <h3 className={styles.cardTitle}>Recent Operations Tasks</h3>
+          
           <div className={styles.feedList}>
-            <div className={styles.feedItem}>
-              <span className={styles.feedDot} style={{ backgroundColor: '#16a34a' }}></span>
-              <div className={styles.feedDetails}>
-                <p className={styles.feedText}>
-                  <strong>VAPT Report</strong> submitted for project <em>Rynex Redesign</em>
-                </p>
-                <span className={styles.feedTime}>2 hours ago • by Intern Alex</span>
-              </div>
-            </div>
-
-            <div className={styles.feedItem}>
-              <span className={styles.feedDot} style={{ backgroundColor: '#0089ab' }}></span>
-              <div className={styles.feedDetails}>
-                <p className={styles.feedText}>
-                  New user account created: <strong>Developer John</strong>
-                </p>
-                <span className={styles.feedTime}>5 hours ago • by CEO Admin</span>
-              </div>
-            </div>
-
-            <div className={styles.feedItem}>
-              <span className={styles.feedDot} style={{ backgroundColor: '#d97706' }}></span>
-              <div className={styles.feedDetails}>
-                <p className={styles.feedText}>
-                  Project contract status updated to <em>IN_PROGRESS</em>: <strong>Client Corp SOC Audit</strong>
-                </p>
-                <span className={styles.feedTime}>Yesterday • by Admin Sarah</span>
-              </div>
-            </div>
+            {stats.recentTasks && stats.recentTasks.length > 0 ? (
+              stats.recentTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={styles.feedItem}
+                  onClick={() => handleTaskClick(task)}
+                >
+                  <span
+                    className={styles.feedDot}
+                    style={{
+                      backgroundColor:
+                        task.status === 'DONE'
+                          ? '#00FF99'
+                          : task.status === 'IN_PROGRESS'
+                          ? '#00E5FF'
+                          : '#FF9100',
+                    }}
+                  ></span>
+                  <div className={styles.feedDetails}>
+                    <p className={styles.feedText}>
+                      <strong>{task.title}</strong> — <em>{task.project?.title || 'System'}</em>
+                    </p>
+                    <span className={styles.feedTime}>
+                      Status: [{task.status}] • Assigned to: {task.assignedTo?.name || 'Unassigned'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p style={{ color: '#64748B', fontSize: '13px' }}>
+                No active tasks found in database. Create tasks from the Tasks tab.
+              </p>
+            )}
           </div>
         </div>
 
         <div className={styles.infoCard}>
-          <h3 className={styles.cardTitle}>Quick Links & Controls</h3>
+          <h3 className={styles.cardTitle}>Quick Actions</h3>
           <div className={styles.quickLinks}>
-            {['CEO', 'ADMIN', 'DEVELOPER'].includes(session.role) && (
-              <a href="/portal/users" className={styles.linkButton}>
-                <i className="fas fa-user-plus" aria-hidden="true"></i>
-                <span>Add Intern / Client</span>
-              </a>
-            )}
             <a href="/portal/projects" className={styles.linkButton}>
               <i className="fas fa-folder-open" aria-hidden="true"></i>
               <span>View Projects</span>
             </a>
-            {session.role !== 'CLIENT' && (
-              <a href="/portal/reports" className={styles.linkButton}>
-                <i className="fas fa-file-upload" aria-hidden="true"></i>
-                <span>Upload Report</span>
-              </a>
-            )}
+            <a href="/portal/tasks" className={styles.linkButton}>
+              <i className="fas fa-list-check" aria-hidden="true"></i>
+              <span>Task Board</span>
+            </a>
+            <a href="/portal/reports" className={styles.linkButton}>
+              <i className="fas fa-file-upload" aria-hidden="true"></i>
+              <span>Upload Report</span>
+            </a>
+            <a href="/portal/users" className={styles.linkButton}>
+              <i className="fas fa-user-gear" aria-hidden="true"></i>
+              <span>Personnel List</span>
+            </a>
           </div>
         </div>
       </div>
+
+      {/* Terminal CLI Modal */}
+      <TerminalTaskModal
+        task={selectedTask}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onStatusUpdate={handleStatusUpdate}
+      />
     </div>
   );
 }

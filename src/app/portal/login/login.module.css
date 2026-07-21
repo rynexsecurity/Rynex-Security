@@ -3,132 +3,355 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--gray-10);
-  padding: var(--sp-06);
+  background-color: #0A0D1E;
+  background-image: 
+    radial-gradient(rgba(0, 229, 255, 0.08) 1px, transparent 0),
+    radial-gradient(rgba(0, 255, 153, 0.05) 1px, transparent 0);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  padding: 1.5rem;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
 }
 
 .loginCard {
-  background-color: var(--white);
-  border: 1px solid var(--gray-20);
-  border-radius: 4px;
-  padding: var(--sp-08);
+  background-color: #12172A;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  border-radius: 8px;
   width: 100%;
-  max-width: 440px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 229, 255, 0.1);
+  overflow: hidden;
+}
+
+.terminalHeader {
+  background: #0D1120;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+}
+
+.terminalDots {
+  display: flex;
+  gap: 6px;
+}
+
+.dotRed { width: 10px; height: 10px; border-radius: 50%; background: #FF5F56; }
+.dotYellow { width: 10px; height: 10px; border-radius: 50%; background: #FFBD2E; }
+.dotGreen { width: 10px; height: 10px; border-radius: 50%; background: #27C93F; }
+
+.terminalTitle {
+  font-size: 11px;
+  color: #64748B;
+  letter-spacing: 0.5px;
+}
+
+.cardBody {
+  padding: 2rem;
 }
 
 .logoArea {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-03);
-  margin-bottom: var(--sp-06);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .logoImg {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
-  filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.5));
+  filter: drop-shadow(0 0 12px rgba(0, 255, 153, 0.8));
+  animation: pulseGlow 3s infinite alternate ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0% { filter: drop-shadow(0 0 8px rgba(0, 255, 153, 0.5)); transform: scale(1); }
+  100% { filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.9)); transform: scale(1.05); }
 }
 
 .logoText {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--gray-90);
+  letter-spacing: 2px;
+  color: #00FF99;
+  text-shadow: 0 0 10px rgba(0, 255, 153, 0.4);
 }
 
-.title {
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--gray-100);
-  text-align: center;
-  margin-bottom: var(--sp-02);
+.bootSequence {
+  background: #080A15;
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 11px;
+  color: #94A3B8;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.subtitle {
-  font-size: 14px;
-  color: var(--gray-60);
-  text-align: center;
-  margin-bottom: var(--sp-06);
+.bootOk {
+  color: #00FF99;
+  font-weight: 700;
+}
+
+.bootHighlight {
+  color: #00E5FF;
 }
 
 .errorBox {
-  background-color: #fff1f1;
-  border-left: 4px solid var(--support-error);
-  color: var(--support-error);
-  padding: var(--sp-04);
-  font-size: 14px;
-  margin-bottom: var(--sp-05);
-  border-radius: 2px;
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid #FF0055;
+  color: #FF4D4D;
+  padding: 0.75rem;
+  font-size: 12px;
+  margin-bottom: 1.25rem;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-05);
+  gap: 1.25rem;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-02);
+  gap: 0.4rem;
 }
 
 .label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--gray-70);
+  color: #00E5FF;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.promptPrefix {
+  color: #00FF99;
 }
 
 .input {
   width: 100%;
-  padding: var(--sp-04);
-  font-size: 15px;
-  border: 1px solid var(--gray-30);
-  background-color: var(--white);
-  color: var(--gray-100);
-  border-radius: 2px;
-  transition: border-color var(--motion);
+  padding: 0.75rem 1rem;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  background-color: #080A15;
+  color: #F8FAFC;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--cyan-text);
-  box-shadow: 0 0 0 1px var(--cyan-text);
+  border-color: #00FF99;
+  box-shadow: 0 0 12px rgba(0, 255, 153, 0.3);
 }
 
 .submitBtn {
-  background-color: var(--gray-90);
-  color: var(--white);
-  padding: var(--sp-04);
-  font-size: 15px;
-  font-weight: 500;
-  border: none;
-  border-radius: 2px;
+  background: linear-gradient(135deg, rgba(0, 255, 153, 0.2), rgba(0, 229, 255, 0.2));
+  color: #00FF99;
+  border: 1px solid #00FF99;
+  padding: 0.8rem;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color var(--motion);
-  margin-top: var(--sp-02);
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.2);
 }
 
 .submitBtn:hover:not(:disabled) {
-  background-color: var(--gray-100);
+  background: linear-gradient(135deg, #00FF99, #00E5FF);
+  color: #0A0D1E;
+  box-shadow: 0 0 25px rgba(0, 255, 153, 0.6);
 }
 
 .submitBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .footer {
-  font-size: 11px;
-  color: var(--gray-60);
+  font-size: 10px;
+  color: #475569;
   text-align: center;
-  margin-top: var(--sp-07);
-  font-family: var(--font-mono);
+  margin-top: 1.5rem;
+  letter-spacing: 0.5px;
 }
+
+/* SUCCESS LOGIN POPUP MODAL */
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 21, 0.92);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeInPopup 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInPopup {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.popupCard {
+  background: #0D1120;
+  border: 1px solid #00FF99;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  width: 90%;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(0, 255, 153, 0.35), 0 0 15px rgba(0, 229, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  animation: popInCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes popInCard {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.popupLogoContainer {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.logoPulseRing {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 153, 0.6);
+  animation: ringExpand 1.8s infinite ease-out;
+}
+
+@keyframes ringExpand {
+  0% { transform: scale(0.8); opacity: 1; border-color: #00FF99; }
+  100% { transform: scale(1.4); opacity: 0; border-color: #00E5FF; }
+}
+
+.popupLogoImg {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(0, 255, 153, 0.9));
+  animation: logoGlowZoom 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlowZoom {
+  0% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(0, 255, 153, 0.7)); }
+  100% { transform: scale(1.08); filter: drop-shadow(0 0 30px rgba(0, 229, 255, 1)); }
+}
+
+.accessGrantedBadge {
+  background: rgba(0, 255, 153, 0.12);
+  color: #00FF99;
+  border: 1px solid #00FF99;
+  padding: 0.35rem 1rem;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.3);
+  text-shadow: 0 0 8px rgba(0, 255, 153, 0.5);
+}
+
+.popupTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #F8FAFC;
+  letter-spacing: 1.5px;
+  margin: 0;
+}
+
+.userInfoBox {
+  background: #080A15;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.85rem 1.25rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.userName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #00E5FF;
+}
+
+.userRoleBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00FF99;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.userEmail {
+  font-size: 11px;
+  color: #64748B;
+}
+
+.loadingProgressContainer {
+  width: 100%;
+  height: 4px;
+  background: #080A15;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.loadingProgressBar {
+  height: 100%;
+  background: linear-gradient(90deg, #00FF99, #00E5FF);
+  width: 0%;
+  animation: fillProgress 1.6s ease-in-out forwards;
+  box-shadow: 0 0 10px #00FF99;
+}
+
+@keyframes fillProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.popupStatusText {
+  font-size: 10px;
+  color: #94A3B8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+

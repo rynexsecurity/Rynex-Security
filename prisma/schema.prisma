@@ -11,6 +11,7 @@ generator client {
 enum Role {
   CEO
   ADMIN
+  DIRECTOR
   DEVELOPER
   HEAD
   INTERN
@@ -60,12 +61,21 @@ enum TaskPriority {
   URGENT
 }
 
+enum Department {
+  RED_TEAM
+  BLUE_TEAM
+  TECHNICAL
+  GRC
+  OPERATIONS
+}
+
 model User {
   id                 String          @id @default(uuid())
   name               String
   email              String          @unique
   passwordHash       String
   role               Role            @default(INTERN)
+  department         Department?     @default(TECHNICAL)
   teamId             String?
   team               Team?           @relation("TeamMembers", fields: [teamId], references: [id])
   isActive           Boolean         @default(true)
@@ -96,13 +106,14 @@ model User {
 }
 
 model Team {
-  id        String    @id @default(uuid())
-  name      String
-  headId    String?
-  head      User?     @relation("TeamHead", fields: [headId], references: [id])
-  members   User[]    @relation("TeamMembers")
-  projects  Project[]
-  createdAt DateTime  @default(now())
+  id         String      @id @default(uuid())
+  name       String
+  department Department? @default(TECHNICAL)
+  headId     String?
+  head       User?       @relation("TeamHead", fields: [headId], references: [id])
+  members    User[]      @relation("TeamMembers")
+  projects   Project[]
+  createdAt  DateTime    @default(now())
 }
 
 model Project {

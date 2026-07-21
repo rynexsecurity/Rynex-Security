@@ -4,6 +4,7 @@ import {
   sendContactConfirmationEmail,
   sendTeamNotification,
 } from "@/lib/mailer";
+import { validateEmail } from "@/lib/email-validator";
 
 const INQUIRY_LABELS: Record<string, string> = {
   general: "General Inquiry",
@@ -78,10 +79,11 @@ export async function POST(req: Request) {
     );
   }
 
-  if (email.length > 254 || !isValidEmail(email)) {
+  const emailValidation = validateEmail(email);
+  if (email.length > 254 || !emailValidation.isValid) {
     return NextResponse.json(
       {
-        error: "Please provide a valid email address.",
+        error: emailValidation.error || "Please provide a valid email address.",
       },
       {
         status: 400,

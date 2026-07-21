@@ -7,17 +7,9 @@ import { sendConfirmationEmail } from '@/lib/mailer';
 import { buildPortalCredentialsEmail } from '@/lib/email-templates/portal-credentials';
 
 // Helper to check if role has user creation rights
-function canCreateRole(creatorRole: string, targetRole: string): boolean {
-  if (creatorRole === 'CEO') return true;
-  if (creatorRole === 'ADMIN' || creatorRole === 'DEVELOPER') {
-    // Admin/Developer can create anyone except CEO
-    return targetRole !== 'CEO';
-  }
-  if (creatorRole === 'HEAD') {
-    // Head can only create Developer and Intern
-    return targetRole === 'DEVELOPER' || targetRole === 'INTERN';
-  }
-  return false;
+function canCreateRole(creatorRole: string): boolean {
+  // Only ADMIN is permitted to create users
+  return creatorRole === 'ADMIN';
 }
 
 export async function GET() {
@@ -29,23 +21,24 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { role, userId, teamId } = session;
+    const { role, teamId } = session;
 
     // Permissions check
-    if (role === 'INTERN' || role === 'CLIENT') {
+    if (role === 'DEVELOPER' || role === 'INTERN' || role === 'CLIENT') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     let users;
 
-    if (role === 'CEO' || role === 'ADMIN' || role === 'DEVELOPER') {
-      // CEO/Admin/Developer see all users
+    if (role === 'CEO' || role === 'ADMIN' || role === 'DIRECTOR') {
+      // CEO, Admin, and Director see all users
       users = await db.user.findMany({
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
+          department: true,
           teamId: true,
           isActive: true,
           lastLogin: true,
@@ -69,6 +62,7 @@ export async function GET() {
             name: true,
             email: true,
             role: true,
+            department: true,
             teamId: true,
             isActive: true,
             lastLogin: true,
@@ -102,14 +96,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { role: creatorRole, userId: creatorId, teamId: creatorTeamId } = session;
+    const { role: creatorRole, userId: creatorId } = session;
 
-    // Check if creator is allowed to create users
-    if (creatorRole === 'INTERN' || creatorRole === 'CLIENT') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Only Admin can create users
+    if (!canCreateRole(creatorRole)) {
+      return NextResponse.json({ error: 'Only ADMIN accounts can create users' }, { status: 403 });
     }
 
-    const { name, email, role: targetRole, password, teamId, originalEmail, joiningDate, probationStart, probationEnd } = await request.json();
+    const { name, email, role: targetRole, department, password, teamId, originalEmail, joiningDate, probationStart, probationEnd } = await request.json();
 
     if (!name || !email || !targetRole || !password) {
       return NextResponse.json(
@@ -118,19 +112,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Role-specific assignment rules
-    if (!canCreateRole(creatorRole, targetRole)) {
-      return NextResponse.json(
-        { error: 'You do not have permission to create this role' },
-        { status: 403 }
-      );
-    }
-
-    // If Head is creating, enforce they only create within their own team
     let finalTeamId = teamId;
-    if (creatorRole === 'HEAD') {
-      finalTeamId = creatorTeamId;
-    }
 
     // Check if email already exists
     const emailLower = email.toLowerCase();
@@ -155,6 +137,7 @@ export async function POST(request: Request) {
         email: emailLower,
         passwordHash,
         role: targetRole,
+        department: department || 'TECHNICAL',
         teamId: finalTeamId || null,
         createdById: creatorId,
         mustChangePassword: true,

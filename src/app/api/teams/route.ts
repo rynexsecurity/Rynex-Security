@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { name, headId } = await request.json();
+    const { name, department, headId } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: 'Team name is required' }, { status: 400 });
@@ -77,6 +77,7 @@ export async function POST(request: Request) {
     const team = await db.team.create({
       data: {
         name,
+        department: department || 'TECHNICAL',
         headId: headId || null,
       },
     });

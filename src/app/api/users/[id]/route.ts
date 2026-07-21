@@ -21,13 +21,13 @@ export async function PUT(
 
     const { role: creatorRole, userId: creatorId } = session;
 
-    // Check permissions
-    if (creatorRole !== 'CEO' && creatorRole !== 'ADMIN' && creatorRole !== 'DEVELOPER') {
+    // CEO and ADMIN are allowed to edit. Other roles are forbidden.
+    if (creatorRole !== 'CEO' && creatorRole !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, role, teamId, isActive, resetPassword, originalEmail, joiningDate, probationStart, probationEnd } = body;
+    const { name, role, department, teamId, isActive, resetPassword, originalEmail, joiningDate, probationStart, probationEnd } = body;
 
     // Retrieve target user
     const targetUser = await db.user.findUnique({ where: { id: targetUserId } });
@@ -35,29 +35,44 @@ export async function PUT(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // CEO cannot be modified by anyone except CEO themselves
+    // CEO cannot modify user role, team, or credentials — CEO can ONLY toggle isActive (Block/Deactivate).
+    if (creatorRole === 'CEO') {
+      if (name !== undefined || role !== undefined || department !== undefined || teamId !== undefined || resetPassword !== undefined) {
+        return NextResponse.json({ error: 'CEO can only block or deactivate users. Full user editing is restricted to ADMIN.' }, { status: 403 });
+      }
+    }
+
+    // CEO account cannot be modified by non-CEO, EXCEPT when ADMIN toggles isActive status
     if (targetUser.role === 'CEO' && creatorRole !== 'CEO') {
-      return NextResponse.json({ error: 'Cannot modify CEO account' }, { status: 403 });
+      const isOnlyTogglingActive = isActive !== undefined && name === undefined && role === undefined && department === undefined && teamId === undefined && resetPassword === undefined && originalEmail === undefined && joiningDate === undefined && probationStart === undefined && probationEnd === undefined;
+      
+      if (!isOnlyTogglingActive || creatorRole !== 'ADMIN') {
+        return NextResponse.json({ error: 'Cannot modify CEO details (only status activation/deactivation allowed)' }, { status: 403 });
+      }
     }
 
     const updateData: any = {};
     const auditDetails: string[] = [];
 
-    if (name !== undefined) {
+    if (name !== undefined && creatorRole === 'ADMIN') {
       updateData.name = name;
       auditDetails.push(`Name: ${targetUser.name} -> ${name}`);
     }
 
-    if (role !== undefined) {
-      // Non-CEO cannot change user to CEO
-      if (role === 'CEO' && creatorRole !== 'CEO') {
+    if (role !== undefined && creatorRole === 'ADMIN') {
+      if (role === 'CEO') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
       updateData.role = role;
       auditDetails.push(`Role: ${targetUser.role} -> ${role}`);
     }
 
-    if (teamId !== undefined) {
+    if (department !== undefined && creatorRole === 'ADMIN') {
+      updateData.department = department;
+      auditDetails.push(`Department: ${targetUser.department} -> ${department}`);
+    }
+
+    if (teamId !== undefined && creatorRole === 'ADMIN') {
       updateData.teamId = teamId || null;
       auditDetails.push(`TeamId: ${targetUser.teamId} -> ${teamId}`);
     }
@@ -67,34 +82,33 @@ export async function PUT(
       auditDetails.push(`Active: ${targetUser.isActive} -> ${isActive}`);
     }
 
-    if (originalEmail !== undefined) {
+    if (originalEmail !== undefined && creatorRole === 'ADMIN') {
       updateData.originalEmail = originalEmail || null;
       auditDetails.push(`OriginalEmail: ${targetUser.originalEmail} -> ${originalEmail}`);
     }
 
-    if (joiningDate !== undefined) {
+    if (joiningDate !== undefined && creatorRole === 'ADMIN') {
       updateData.joiningDate = joiningDate ? new Date(joiningDate) : null;
       auditDetails.push(`JoiningDate: ${targetUser.joiningDate} -> ${joiningDate}`);
     }
 
-    if (probationStart !== undefined) {
+    if (probationStart !== undefined && creatorRole === 'ADMIN') {
       updateData.probationStart = probationStart ? new Date(probationStart) : null;
       auditDetails.push(`ProbationStart: ${targetUser.probationStart} -> ${probationStart}`);
     }
 
-    if (probationEnd !== undefined) {
+    if (probationEnd !== undefined && creatorRole === 'ADMIN') {
       updateData.probationEnd = probationEnd ? new Date(probationEnd) : null;
       auditDetails.push(`ProbationEnd: ${targetUser.probationEnd} -> ${probationEnd}`);
     }
 
-    // Handle Password Reset
-    if (resetPassword) {
+    // Handle Password Reset (Admin only)
+    if (resetPassword && creatorRole === 'ADMIN') {
       const hashed = await hashPassword(resetPassword);
       updateData.passwordHash = hashed;
       updateData.mustChangePassword = true;
       auditDetails.push('Password Reset initiated');
 
-      // Send email with new password
       const emailTemplate = buildPortalCredentialsEmail(
         targetUser.name,
         targetUser.email,
@@ -140,6 +154,57 @@ export async function PUT(
     console.error('Error updating user:', error);
     return NextResponse.json(
       { error: 'An error occurred while updating user' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: targetUserId } = await params;
+    const cookieStore = await cookies();
+    const session = await getSessionUser(cookieStore);
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { role: creatorRole, userId: creatorId } = session;
+
+    // Only Admin can delete users
+    if (creatorRole !== 'ADMIN') {
+      return NextResponse.json({ error: 'Only ADMIN accounts can delete users' }, { status: 403 });
+    }
+
+    const targetUser = await db.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    if (targetUser.role === 'CEO') {
+      return NextResponse.json({ error: 'Cannot delete CEO account' }, { status: 403 });
+    }
+
+    await db.user.delete({ where: { id: targetUserId } });
+
+    await db.auditLog.create({
+      data: {
+        userId: creatorId,
+        action: 'DELETE_USER',
+        entityType: 'User',
+        entityId: targetUserId,
+        details: `Deleted user ${targetUser.name} (${targetUser.email})`,
+      },
+    });
+
+    return NextResponse.json({ success: true, message: 'User deleted successfully' });
+  } catch (error: any) {
+    console.error('Error deleting user:', error);
+    return NextResponse.json(
+      { error: 'An error occurred while deleting user' },
       { status: 500 }
     );
   }

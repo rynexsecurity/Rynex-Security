@@ -1,0 +1,223 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 7, 15, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+}
+
+.modal {
+  background-color: #0A0D1E;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 153, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #0D1120;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dotRed,
+.dotYellow,
+.dotGreen {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.dotRed { background: #FF5F56; }
+.dotYellow { background: #FFBD2E; }
+.dotGreen { background: #27C93F; }
+
+.dotRed:hover { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 95, 86, 0.7); }
+.dotYellow:hover { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 189, 46, 0.7); }
+.dotGreen:hover { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 8px rgba(39, 201, 63, 0.7); }
+
+.headerTitle {
+  font-size: 12px;
+  color: #00FF99;
+  letter-spacing: 0.5px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #FF0055;
+}
+
+.body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: #080A15;
+}
+
+.cliPrompt {
+  color: #00FF99;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cliCommand {
+  color: #F8FAFC;
+  font-weight: 500;
+}
+
+.logBox {
+  background: #12172A;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 6px;
+  padding: 1.25rem;
+  font-size: 13px;
+  color: #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.key {
+  color: #00E5FF;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.val {
+  color: #F8FAFC;
+  font-weight: 500;
+}
+
+.descriptionBox {
+  background: #0A0D1E;
+  border: 1px solid rgba(0, 255, 153, 0.15);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  color: #CBD5E1;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.telemetryLogs {
+  font-size: 11px;
+  color: #64748B;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.telemetryLine {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ts {
+  color: #00FF99;
+}
+
+.statusSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statusLabel {
+  font-size: 11px;
+  color: #00E5FF;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.statusButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.statusBtn {
+  padding: 0.5rem 1rem;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94A3B8;
+}
+
+.statusBtn:hover {
+  border-color: #00FF99;
+  color: #00FF99;
+}
+
+.statusBtnActiveTodo {
+  background: rgba(255, 145, 0, 0.2);
+  border-color: #FF9100;
+  color: #FF9100;
+  box-shadow: 0 0 10px rgba(255, 145, 0, 0.3);
+}
+
+.statusBtnActiveProgress {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: #00E5FF;
+  color: #00E5FF;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+.statusBtnActiveDone {
+  background: rgba(0, 255, 153, 0.2);
+  border-color: #00FF99;
+  color: #00FF99;
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+}

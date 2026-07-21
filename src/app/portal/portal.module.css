@@ -3,9 +3,9 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: var(--gray-10);
-  color: var(--gray-100);
-  font-family: var(--font-sans);
+  background-color: #0A0D1E;
+  color: #F8FAFC;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
 }
 
 .mainContent {
@@ -14,21 +14,45 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  background-color: #0A0D1E;
 }
 
 .scrollArea {
   flex: 1;
   overflow-y: auto;
-  padding: var(--sp-06);
-  background-color: var(--gray-10);
+  padding: 1.5rem 2rem;
+  background-color: #0A0D1E;
+}
+
+/* Custom smooth dark scrollbar, hide Windows scrollbar arrows */
+.scrollArea::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.scrollArea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollArea::-webkit-scrollbar-track {
+  background: #080A15;
+}
+
+.scrollArea::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.25);
+  border-radius: 4px;
+}
+
+.scrollArea::-webkit-scrollbar-thumb:hover {
+  background: #00FF99;
 }
 
 @media (max-width: 768px) {
   .portalWrapper {
     flex-direction: column;
   }
-  
   .scrollArea {
-    padding: var(--sp-04);
+    padding: 1rem;
   }
 }

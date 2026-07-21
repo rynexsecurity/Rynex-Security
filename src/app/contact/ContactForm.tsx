@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Button from "@/components/Button";
+import { validateEmail } from "@/lib/email-validator";
 import styles from "./contact.module.css";
 
 type Status = { type: "idle" | "success" | "error"; message: string };
@@ -12,11 +13,22 @@ export default function ContactForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitting(true);
-    setStatus({ type: "idle", message: "" });
 
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
+    const email = (data.email as string) || "";
+
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.isValid) {
+      setStatus({
+        type: "error",
+        message: emailCheck.error || "Temporary/disposable email addresses are not permitted. Please use a valid email (Gmail, Proton, Outlook, Hotmail, or .edu).",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    setStatus({ type: "idle", message: "" });
 
     try {
       const res = await fetch("/api/contact", {

@@ -10,6 +10,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [loggedUser, setLoggedUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,71 +32,129 @@ export default function LoginPage() {
         throw new Error(data.error || 'Invalid credentials');
       }
 
-      // Successful login
-      router.push('/portal/dashboard');
-      router.refresh();
+      setLoggedUser(data.user);
+      setShowSuccessPopup(true);
+
+      setTimeout(() => {
+        router.push('/portal/dashboard');
+        router.refresh();
+      }, 1800);
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.loginCard}>
-        <div className={styles.logoArea}>
-          <Image
-            src="/images/logo-transparent.png"
-            alt="Rynex Security"
-            width={32}
-            height={32}
-            className={styles.logoImg}
-          />
-          <span className={styles.logoText}>Rynex Security</span>
+      {/* SUCCESS LOGIN POPUP WITH RYNEX LOGO */}
+      {showSuccessPopup && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popupCard}>
+            <div className={styles.popupLogoContainer}>
+              <div className={styles.logoPulseRing}></div>
+              <Image
+                src="/images/logo-transparent.png"
+                alt="Rynex Security"
+                width={80}
+                height={80}
+                className={styles.popupLogoImg}
+                priority
+              />
+            </div>
+            <div className={styles.accessGrantedBadge}>[ ACCESS GRANTED ]</div>
+            <h2 className={styles.popupTitle}>AUTHENTICATION SUCCESSFUL</h2>
+            
+            {loggedUser && (
+              <div className={styles.userInfoBox}>
+                <div className={styles.userName}>{loggedUser.name}</div>
+                <div className={styles.userRoleBadge}>{loggedUser.role} ACCESS</div>
+                <div className={styles.userEmail}>{loggedUser.email}</div>
+              </div>
+            )}
+
+            <div className={styles.loadingProgressContainer}>
+              <div className={styles.loadingProgressBar}></div>
+            </div>
+            <div className={styles.popupStatusText}>
+              INITIALIZING ENCRYPTED SEC-OPS TERMINAL...
+            </div>
+          </div>
         </div>
-        
-        <h1 className={styles.title}>Internal Portal</h1>
-        <p className={styles.subtitle}>Enter your custom credentials to access the security hub.</p>
+      )}
 
-        {error && <div className={styles.errorBox}>{error}</div>}
+      <div className={styles.loginCard}>
+        <div className={styles.terminalHeader}>
+          <div className={styles.terminalDots}>
+            <button className={styles.dotRed} title="Close"></button>
+            <button className={styles.dotYellow} title="Minimize"></button>
+            <button className={styles.dotGreen} title="Zoom"></button>
+          </div>
+          <span className={styles.terminalTitle}>rynex@sec-ops: ~ /bin/auth</span>
+        </div>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="email" className={styles.label}>Email Address</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-              placeholder="name@rynexsecurity.com"
-              required
-              disabled={loading}
+        <div className={styles.cardBody}>
+          <div className={styles.logoArea}>
+            <Image
+              src="/images/logo-transparent.png"
+              alt="Rynex Security"
+              width={44}
+              height={44}
+              className={styles.logoImg}
             />
+            <span className={styles.logoText}>Rynex Security Hub</span>
           </div>
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="password" className={styles.label}>Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles.input}
-              placeholder="••••••••"
-              required
-              disabled={loading}
-            />
+          <div className={styles.bootSequence}>
+            <div><span className={styles.bootOk}>[OK]</span> Initializing Rynex Security Kernel v4.19.0...</div>
+            <div><span className={styles.bootOk}>[OK]</span> Mounting encrypted database partitions...</div>
+            <div><span className={styles.bootOk}>[OK]</span> Enforcing Zero-Trust Access Protocol...</div>
+            <div><span className={styles.bootHighlight}>[SYS]</span> Authentic credentials required.</div>
           </div>
 
-          <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? 'Securing Session...' : 'Authenticate'}
-          </button>
-        </form>
+          {error && <div className={styles.errorBox}>[ERROR] {error}</div>}
 
-        <div className={styles.footer}>
-          Authorized Personnel Only • IP addresses are logged.
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="email" className={styles.label}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.input}
+                placeholder="user@rynexsecurity.com"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="password" className={styles.label}>
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.input}
+                placeholder="••••••••••••"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <button type="submit" className={styles.submitBtn} disabled={loading}>
+              {loading ? 'Authenticating Session...' : 'Authenticate'}
+            </button>
+          </form>
+
+          <div className={styles.footer}>
+            RESTRICTED ACCESS • IP ADDRESSES ARE LOGGED
+          </div>
         </div>
       </div>
     </div>

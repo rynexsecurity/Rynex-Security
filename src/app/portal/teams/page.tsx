@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './teams.module.css';
+import { DEPARTMENT_LABELS } from '@/lib/portal/permissions';
 
 interface TeamData {
   id: string;
   name: string;
+  department?: string | null;
   head: {
     id: string;
     name: string;
@@ -33,6 +35,7 @@ export default function TeamsPage() {
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [teamName, setTeamName] = useState('');
+  const [department, setDepartment] = useState('TECHNICAL');
   const [headId, setHeadId] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -41,13 +44,11 @@ export default function TeamsPage() {
     setLoading(true);
     setError('');
     try {
-      // Fetch teams
       const teamsRes = await fetch('/api/teams');
       const teamsData = await teamsRes.json();
       if (!teamsRes.ok) throw new Error(teamsData.error || 'Failed to fetch teams');
       setTeams(teamsData.teams || []);
 
-      // Fetch users (to select team head)
       const usersRes = await fetch('/api/users');
       const usersData = await usersRes.json();
       if (usersRes.ok) {
@@ -75,6 +76,7 @@ export default function TeamsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: teamName,
+          department,
           headId: headId || null,
         }),
       });
@@ -85,6 +87,7 @@ export default function TeamsPage() {
       await fetchData();
       setShowCreateModal(false);
       setTeamName('');
+      setDepartment('TECHNICAL');
       setHeadId('');
     } catch (err: any) {
       setSubmitError(err.message || 'An error occurred.');
@@ -93,60 +96,67 @@ export default function TeamsPage() {
     }
   };
 
-  // Filter users eligible to lead a team (CEO, ADMIN, DEVELOPER, HEAD)
   const eligibleHeads = users.filter((u) =>
-    ['CEO', 'ADMIN', 'DEVELOPER', 'HEAD'].includes(u.role)
+    ['CEO', 'ADMIN', 'DEVELOPER', 'HEAD', 'DIRECTOR'].includes(u.role)
   );
 
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Team Roster</h1>
-          <p className={styles.pageSubtitle}>Organize departments, assign team heads, and view project allocations.</p>
+          <h1 className={styles.pageTitle}>Department Teams</h1>
+          <p className={styles.pageSubtitle}>Organize Red Team, Blue Team, Technical &amp; GRC operations rosters.</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
           className={styles.createBtn}
         >
           <i className="fas fa-folder-plus" aria-hidden="true"></i>
-          <span>Create Team</span>
+          <span>Create Department Team</span>
         </button>
       </div>
 
       {error && <div className={styles.errorBanner}>{error}</div>}
 
       {loading ? (
-        <div className={styles.loadingArea}>Retrieving team database...</div>
+        <div className={styles.loadingArea}>Retrieving department rosters...</div>
       ) : (
         <div className={styles.grid}>
-          {teams.map((team) => (
-            <div key={team.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.teamName}>{team.name}</h3>
-                <span className={styles.date}>Since {new Date(team.createdAt).toLocaleDateString()}</span>
-              </div>
+          {teams.map((team) => {
+            const deptKey = team.department || 'TECHNICAL';
+            return (
+              <div key={team.id} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <div>
+                    <h3 className={styles.teamName}>{team.name}</h3>
+                    <span className={`${styles.departmentBadge} ${styles[deptKey.toLowerCase()]}`}>
+                      {DEPARTMENT_LABELS[deptKey] || deptKey}
+                    </span>
+                  </div>
+                  <span className={styles.date}>Since {new Date(team.createdAt).toLocaleDateString()}</span>
+                </div>
 
-              <div className={styles.details}>
-                <div className={styles.detailRow}>
-                  <span className={styles.label}>Team Lead:</span>
-                  <span className={styles.value}>
-                    {team.head ? team.head.name : <span className={styles.unassigned}>Unassigned</span>}
-                  </span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.label}>Active Members:</span>
-                  <span className={styles.value}>{team._count.members}</span>
-                </div>
-                <div className={styles.detailRow}>
-                  <span className={styles.label}>Assigned Projects:</span>
-                  <span className={styles.value}>{team._count.projects}</span>
+                <div className={styles.details}>
+                  <div className={styles.detailRow}>
+                    <span className={styles.label}>Team Lead:</span>
+                    <span className={styles.value}>
+                      {team.head ? team.head.name : <span className={styles.unassigned}>Unassigned</span>}
+                    </span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.label}>Active Personnel:</span>
+                    <span className={styles.value}>{team._count.members}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.label}>Assigned Projects:</span>
+                    <span className={styles.value}>{team._count.projects}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {teams.length === 0 && (
-            <div className={styles.empty}>No teams found. Create a team to get started.</div>
+            <div className={styles.empty}>No department teams found. Create a team to get started.</div>
           )}
         </div>
       )}
@@ -156,7 +166,7 @@ export default function TeamsPage() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
             <div className={styles.modalHeader}>
-              <h3>Create New Department Team</h3>
+              <h3>Create Department Team</h3>
               <button onClick={() => { setShowCreateModal(false); setSubmitError(''); }} className={styles.closeBtn}>
                 <i className="fas fa-times" aria-hidden="true"></i>
               </button>
@@ -172,9 +182,24 @@ export default function TeamsPage() {
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
                   className={styles.modalInput}
-                  placeholder="e.g. Red Team, Blue Team, SOC Operations"
+                  placeholder="e.g. Red Team Alpha, Blue Team SOC, Technical Eng"
                   required
                 />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.modalLabel}>Department</label>
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className={styles.modalSelect}
+                >
+                  <option value="RED_TEAM">🔴 Red Team (Offensive)</option>
+                  <option value="BLUE_TEAM">🔵 Blue Team (Defensive)</option>
+                  <option value="TECHNICAL">🟢 Technical (Engineering)</option>
+                  <option value="GRC">🟣 GRC (Compliance)</option>
+                  <option value="OPERATIONS">🟡 Operations</option>
+                </select>
               </div>
 
               <div className={styles.formGroup}>
@@ -186,7 +211,7 @@ export default function TeamsPage() {
                 >
                   <option value="">Leave Unassigned</option>
                   {eligibleHeads.map((h) => (
-                    <option key={h.id} value={h.id}>{h.name} (${h.role})</option>
+                    <option key={h.id} value={h.id}>{h.name} [{h.role}]</option>
                   ))}
                 </select>
               </div>

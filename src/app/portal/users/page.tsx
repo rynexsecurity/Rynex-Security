@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './users.module.css';
+import { DEPARTMENT_LABELS } from '@/lib/portal/permissions';
 
 interface UserData {
   id: string;
   name: string;
   email: string;
   role: string;
+  department?: string | null;
   teamId: string | null;
   isActive: boolean;
   lastLogin: string | null;
@@ -29,6 +31,11 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
+  // Filters
+  const [search, setSearch] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('ALL');
+  const [roleFilter, setRoleFilter] = useState('ALL');
+
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -39,37 +46,34 @@ export default function UsersPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('INTERN');
+  const [department, setDepartment] = useState('TECHNICAL');
   const [teamId, setTeamId] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Current session & custom inputs
+  // Current session
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   const [originalEmail, setOriginalEmail] = useState('');
   const [joiningDate, setJoiningDate] = useState('');
   const [probationStart, setProbationStart] = useState('');
   const [probationEnd, setProbationEnd] = useState('');
 
-  // Fetch initial data
   const fetchData = async () => {
     setLoading(true);
     setError('');
     try {
-      // Fetch current session role
       const meRes = await fetch('/api/portal/auth/me');
       if (meRes.ok) {
         const meData = await meRes.json();
         setCurrentUserRole(meData.user.role);
       }
 
-      // Fetch users
       const usersRes = await fetch('/api/users');
       const usersData = await usersRes.json();
       if (!usersRes.ok) throw new Error(usersData.error || 'Failed to fetch users');
       setUsers(usersData.users || []);
 
-      // Fetch teams
       const teamsRes = await fetch('/api/teams');
       const teamsData = await teamsRes.json();
       if (teamsRes.ok) {
@@ -86,7 +90,6 @@ export default function UsersPage() {
     fetchData();
   }, []);
 
-  // Create User submit
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError('');
@@ -100,6 +103,7 @@ export default function UsersPage() {
           name,
           email,
           role,
+          department,
           password,
           teamId: teamId || null,
           originalEmail: originalEmail || null,
@@ -112,13 +116,13 @@ export default function UsersPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create user');
 
-      // Refresh list, close modal, clear inputs
       await fetchData();
       setShowCreateModal(false);
       setName('');
       setEmail('');
       setPassword('');
       setRole('INTERN');
+      setDepartment('TECHNICAL');
       setTeamId('');
       setOriginalEmail('');
       setJoiningDate('');
@@ -131,7 +135,6 @@ export default function UsersPage() {
     }
   };
 
-  // Toggle user status (active/inactive)
   const handleToggleStatus = async (user: UserData) => {
     try {
       const res = await fetch(`/api/users/${user.id}`, {
@@ -144,15 +147,12 @@ export default function UsersPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to toggle status');
-
-      // Refresh list
       await fetchData();
     } catch (err: any) {
       alert(err.message || 'Error updating status');
     }
   };
 
-  // Reset Password submit
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser) return;
@@ -182,20 +182,67 @@ export default function UsersPage() {
     }
   };
 
+  const filteredUsers = users.filter((u) => {
+    const matchSearch =
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase());
+    const matchDept = departmentFilter === 'ALL' || (u.department || 'TECHNICAL') === departmentFilter;
+    const matchRole = roleFilter === 'ALL' || u.role === roleFilter;
+    return matchSearch && matchDept && matchRole;
+  });
+
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>User Operations</h1>
-          <p className={styles.pageSubtitle}>Manage and review internal accounts, client access, and assign roles.</p>
+          <h1 className={styles.pageTitle}>Personnel Operations</h1>
+          <p className={styles.pageSubtitle}>Review team rosters across Red Team, Blue Team, Technical &amp; GRC departments.</p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className={styles.createBtn}
+        {currentUserRole === 'ADMIN' && (
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className={styles.createBtn}
+          >
+            <i className="fas fa-user-plus" aria-hidden="true"></i>
+            <span>Create Account</span>
+          </button>
+        )}
+      </div>
+
+      <div className={styles.filterBar}>
+        <input
+          type="text"
+          placeholder="Search personnel by name/email..."
+          className={styles.searchInput}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          className={styles.filterSelect}
+          value={departmentFilter}
+          onChange={(e) => setDepartmentFilter(e.target.value)}
         >
-          <i className="fas fa-user-plus" aria-hidden="true"></i>
-          <span>Create Account</span>
-        </button>
+          <option value="ALL">All Departments</option>
+          <option value="RED_TEAM">🔴 Red Team (Offensive)</option>
+          <option value="BLUE_TEAM">🔵 Blue Team (Defensive)</option>
+          <option value="TECHNICAL">🟢 Technical (Engineering)</option>
+          <option value="GRC">🟣 GRC (Compliance)</option>
+          <option value="OPERATIONS">🟡 Operations</option>
+        </select>
+        <select
+          className={styles.filterSelect}
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+        >
+          <option value="ALL">All Roles</option>
+          <option value="CEO">CEO</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="DIRECTOR">DIRECTOR</option>
+          <option value="HEAD">HEAD</option>
+          <option value="DEVELOPER">DEVELOPER</option>
+          <option value="INTERN">INTERN</option>
+          <option value="CLIENT">CLIENT</option>
+        </select>
       </div>
 
       {error && <div className={styles.errorBanner}>{error}</div>}
@@ -210,6 +257,7 @@ export default function UsersPage() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Department</th>
                 <th>Team</th>
                 <th>Status</th>
                 <th>Last Login</th>
@@ -217,63 +265,71 @@ export default function UsersPage() {
                   <>
                     <th>Original Email</th>
                     <th>Joining Date</th>
-                    <th>Probation Start</th>
                   </>
                 )}
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className={styles.primaryCell}>{user.name}</td>
-                  <td className={styles.monoCell}>{user.email}</td>
-                  <td>
-                    <span className={`${styles.roleBadge} ${styles[user.role.toLowerCase()]}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td>
-                    {teams.find((t) => t.id === user.teamId)?.name || <span className={styles.none}>None</span>}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleToggleStatus(user)}
-                      className={`${styles.statusToggle} ${user.isActive ? styles.active : styles.inactive}`}
-                      title={user.isActive ? 'Deactivate Account' : 'Activate Account'}
-                    >
-                      {user.isActive ? 'Active' : 'Suspended'}
-                    </button>
-                  </td>
-                  <td className={styles.dateCell}>
-                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}
-                  </td>
-                  {(currentUserRole === 'CEO' || currentUserRole === 'ADMIN') && (
-                    <>
-                      <td className={styles.monoCell}>{user.originalEmail || <span className={styles.none}>None</span>}</td>
-                      <td className={styles.dateCell}>{user.joiningDate ? new Date(user.joiningDate).toLocaleDateString() : '—'}</td>
-                      <td className={styles.dateCell}>{user.probationStart ? new Date(user.probationStart).toLocaleDateString() : '—'}</td>
-                    </>
-                  )}
-                  <td>
-                    <div className={styles.actions}>
+              {filteredUsers.map((user) => {
+                const deptKey = user.department || 'TECHNICAL';
+                return (
+                  <tr key={user.id}>
+                    <td className={styles.primaryCell}>{user.name}</td>
+                    <td className={styles.monoCell}>{user.email}</td>
+                    <td>
+                      <span className={`${styles.roleBadge} ${styles[user.role.toLowerCase()]}`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`${styles.departmentBadge} ${styles[deptKey.toLowerCase()]}`}>
+                        {DEPARTMENT_LABELS[deptKey] || deptKey}
+                      </span>
+                    </td>
+                    <td>
+                      {teams.find((t) => t.id === user.teamId)?.name || <span className={styles.none}>Unassigned</span>}
+                    </td>
+                    <td>
                       <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowResetModal(true);
-                        }}
-                        className={styles.resetBtn}
-                        title="Reset password"
+                        onClick={() => handleToggleStatus(user)}
+                        className={`${styles.statusToggle} ${user.isActive ? styles.active : styles.inactive}`}
+                        title={user.isActive ? 'Deactivate Account' : 'Activate Account'}
                       >
-                        <i className="fas fa-key" aria-hidden="true"></i> Reset Pass
+                        {user.isActive ? 'Active' : 'Suspended'}
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {users.length === 0 && (
+                    </td>
+                    <td className={styles.dateCell}>
+                      {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}
+                    </td>
+                    {(currentUserRole === 'CEO' || currentUserRole === 'ADMIN') && (
+                      <>
+                        <td className={styles.monoCell}>{user.originalEmail || <span className={styles.none}>None</span>}</td>
+                        <td className={styles.dateCell}>{user.joiningDate ? new Date(user.joiningDate).toLocaleDateString() : '—'}</td>
+                      </>
+                    )}
+                    <td>
+                      {currentUserRole === 'ADMIN' && (
+                        <div className={styles.actions}>
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowResetModal(true);
+                            }}
+                            className={styles.resetBtn}
+                            title="Reset password"
+                          >
+                            <i className="fas fa-key" aria-hidden="true"></i> Reset Pass
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan={(currentUserRole === 'CEO' || currentUserRole === 'ADMIN') ? 10 : 7} className={styles.empty}>No users found.</td>
+                  <td colSpan={10} className={styles.empty}>No personnel records found.</td>
                 </tr>
               )}
             </tbody>
@@ -327,11 +383,27 @@ export default function UsersPage() {
                   className={styles.modalSelect}
                 >
                   <option value="INTERN">INTERN</option>
-                  <option value="HEAD">HEAD</option>
                   <option value="DEVELOPER">DEVELOPER</option>
+                  <option value="HEAD">HEAD</option>
+                  <option value="DIRECTOR">DIRECTOR</option>
                   <option value="ADMIN">ADMIN</option>
                   <option value="CLIENT">CLIENT</option>
                   <option value="CEO">CEO</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.modalLabel}>Department</label>
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className={styles.modalSelect}
+                >
+                  <option value="RED_TEAM">🔴 Red Team (Offensive VAPT)</option>
+                  <option value="BLUE_TEAM">🔵 Blue Team (Defensive SOC)</option>
+                  <option value="TECHNICAL">🟢 Technical (Engineering)</option>
+                  <option value="GRC">🟣 GRC (Compliance)</option>
+                  <option value="OPERATIONS">🟡 Operations</option>
                 </select>
               </div>
 
@@ -359,53 +431,7 @@ export default function UsersPage() {
                   placeholder="Minimum 8 characters"
                   required
                 />
-                <span className={styles.helperText}>User will be forced to change this password on first login.</span>
               </div>
-
-              {(currentUserRole === 'CEO' || currentUserRole === 'ADMIN') && (
-                <>
-                  <div className={styles.formGroup}>
-                    <label className={styles.modalLabel}>Original Email (where credentials are sent)</label>
-                    <input
-                      type="email"
-                      value={originalEmail}
-                      onChange={(e) => setOriginalEmail(e.target.value)}
-                      className={styles.modalInput}
-                      placeholder="e.g. user.personal@gmail.com"
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.modalLabel}>Joining Date</label>
-                    <input
-                      type="date"
-                      value={joiningDate}
-                      onChange={(e) => setJoiningDate(e.target.value)}
-                      className={styles.modalInput}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.modalLabel}>Probation Start Date</label>
-                    <input
-                      type="date"
-                      value={probationStart}
-                      onChange={(e) => setProbationStart(e.target.value)}
-                      className={styles.modalInput}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.modalLabel}>Probation End Date</label>
-                    <input
-                      type="date"
-                      value={probationEnd}
-                      onChange={(e) => setProbationEnd(e.target.value)}
-                      className={styles.modalInput}
-                    />
-                  </div>
-                </>
-              )}
 
               <div className={styles.modalActions}>
                 <button
@@ -434,7 +460,7 @@ export default function UsersPage() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
             <div className={styles.modalHeader}>
-              <h3>Reset Password: {selectedUser.name}</h3>
+              <h3>Reset Password for {selectedUser.name}</h3>
               <button onClick={() => { setShowResetModal(false); setSubmitError(''); }} className={styles.closeBtn}>
                 <i className="fas fa-times" aria-hidden="true"></i>
               </button>
@@ -444,16 +470,15 @@ export default function UsersPage() {
 
             <form onSubmit={handleResetPassword} className={styles.modalForm}>
               <div className={styles.formGroup}>
-                <label className={styles.modalLabel}>New Password</label>
+                <label className={styles.modalLabel}>New Temporary Password</label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className={styles.modalInput}
-                  placeholder="Minimum 8 characters"
+                  placeholder="Enter new password"
                   required
                 />
-                <span className={styles.helperText}>A notification email will be sent to <strong>{selectedUser.email}</strong>.</span>
               </div>
 
               <div className={styles.modalActions}>
@@ -470,7 +495,7 @@ export default function UsersPage() {
                   className={styles.submitBtn}
                   disabled={submitLoading}
                 >
-                  {submitLoading ? 'Resetting...' : 'Reset Password'}
+                  {submitLoading ? 'Updating...' : 'Reset Password'}
                 </button>
               </div>
             </form>

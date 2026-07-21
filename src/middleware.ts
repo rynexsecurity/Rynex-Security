@@ -58,20 +58,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  // Protect against main domain /portal access: redirect all /portal path requests to the subdomain
+  // Protect against main domain /portal access: return 404 page (no redirection)
   if (pathname.startsWith('/portal')) {
-    const targetPath = pathname.replace('/portal', '') || '/';
-    const redirectUrl = request.nextUrl.clone();
-    
-    // Construct the correct subdomain hostname (handles local dev and prod)
-    if (currentHost === 'localhost') {
-      redirectUrl.hostname = 'portal.localhost';
-    } else {
-      redirectUrl.hostname = 'portal.rynexsecurity.com';
-    }
-    
-    redirectUrl.pathname = targetPath;
-    return NextResponse.redirect(redirectUrl);
+    const url = request.nextUrl.clone();
+    url.pathname = '/not-found';
+    return NextResponse.rewrite(url);
   }
 
   return NextResponse.next();
