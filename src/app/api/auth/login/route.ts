@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { signJWT } from '@/lib/auth';
+import { signJWT } from '@/lib/portal/auth';
 import { comparePassword } from '@/lib/password';
+
+function getClientIp(request: Request): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  // fallback — in dev this may be '::1' (IPv6 loopback)
+  return '127.0.0.1';
+}
 
 export async function POST(request: Request) {
   try {
@@ -35,6 +44,63 @@ export async function POST(request: Request) {
       );
     }
 
+    // ─── IP Access Control Check ──────────────────────────────────────────
+    const clientIp = getClientIp(request);
+
+    if (user.allowedIp) {
+      const normalizedAllowed = user.allowedIp.trim();
+      const normalizedClient = clientIp.trim();
+
+      if (normalizedAllowed !== normalizedClient) {
+        // Check if there's already a pending request from this IP
+        const existingRequest = await db.loginRequest.findFirst({
+          where: {
+            userId: user.id,
+            requestedIp: normalizedClient,
+            status: 'PENDING',
+          },
+        });
+
+        if (!existingRequest) {
+          // Create a new login request
+          await db.loginRequest.create({
+            data: {
+              userId: user.id,
+              requestedIp: normalizedClient,
+              currentAllowedIp: normalizedAllowed,
+              status: 'PENDING',
+            },
+          });
+
+          // Notify all ADMIN and CEO users
+          const admins = await db.user.findMany({
+            where: { role: { in: ['ADMIN', 'CEO'] }, isActive: true },
+            select: { id: true },
+          });
+
+          await db.notification.createMany({
+            data: admins.map((admin) => ({
+              userId: admin.id,
+              title: '🚨 Unauthorized Login Attempt',
+              body: `${user.name} (${user.email}) attempted to login from IP ${normalizedClient}. Their authorized IP is ${normalizedAllowed}. Please review in Access Control.`,
+              link: '/portal/access-control',
+            })),
+          });
+        }
+
+        return NextResponse.json(
+          {
+            error: 'IP_NOT_AUTHORIZED',
+            message:
+              'Login from this IP address is not authorized. Your administrator has been notified and will review your request.',
+            requestedIp: normalizedClient,
+          },
+          { status: 403 }
+        );
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     // Create session token
     const token = await signJWT({
       userId: user.id,
@@ -67,7 +133,7 @@ export async function POST(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 8, // 8 hours
       path: '/',
     });
 

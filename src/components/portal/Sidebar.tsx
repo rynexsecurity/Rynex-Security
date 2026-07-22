@@ -47,6 +47,23 @@ export default function Sidebar({
   const email = user?.email || 'user@rynexsecurity.com';
 
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [pendingIpRequests, setPendingIpRequests] = useState(0);
+
+  useEffect(() => {
+    // Fetch pending IP requests count for admin badge
+    if (['ADMIN', 'CEO'].includes(role)) {
+      fetch('/api/portal/access-control')
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.requests) {
+            setPendingIpRequests(
+              data.requests.filter((r: any) => r.status === 'PENDING').length
+            );
+          }
+        })
+        .catch(() => {});
+    }
+  }, [role]);
 
   useEffect(() => {
     // Load theme from localStorage on mount
@@ -160,11 +177,16 @@ export default function Sidebar({
       groups.push({ label: 'Management', items: mgmtItems });
     }
 
-    // System Settings (CEO + ADMIN only)
+    // Security Controls (ADMIN + CEO only)
     if (['CEO', 'ADMIN'].includes(role)) {
       groups.push({
-        label: 'System',
+        label: 'Security Controls',
         items: [
+          {
+            href: '/portal/access-control',
+            icon: 'fas fa-shield-halved',
+            label: 'Access Control',
+          },
           { href: '/portal/settings', icon: 'fas fa-gear', label: 'Settings' },
         ],
       });
@@ -173,7 +195,17 @@ export default function Sidebar({
     return groups;
   };
 
-  const activeNavGroups = navGroups || buildDefaultNavGroups(role);
+  const rawNavGroups = navGroups || buildDefaultNavGroups(role);
+
+  // Inject live pending badge into Access Control item
+  const activeNavGroups = rawNavGroups.map((group) => ({
+    ...group,
+    items: group.items.map((item) =>
+      item.href === '/portal/access-control'
+        ? { ...item, badge: pendingIpRequests }
+        : item
+    ),
+  }));
 
   return (
     <aside className={`${styles.sidebar} ${isMobileOpen ? styles.mobileOpen : ''}`}>

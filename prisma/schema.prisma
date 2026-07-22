@@ -48,6 +48,12 @@ enum ReportStatus {
   REJECTED
 }
 
+enum LoginRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
 enum BlogStatus {
   PENDING
   APPROVED
@@ -96,6 +102,10 @@ model User {
   joiningDate        DateTime?
   probationStart     DateTime?
   probationEnd       DateTime?
+  allowedIp          String?
+  
+  loginRequests      LoginRequest[]  @relation("LoginRequestUser")
+  resolvedRequests   LoginRequest[]  @relation("LoginRequestResolver")
   
   // Relations
   managedTeams       Team[]          @relation("TeamHead")
@@ -226,6 +236,20 @@ model AuditLog {
   details    String?
   ipAddress  String?
   createdAt  DateTime @default(now())
+}
+
+model LoginRequest {
+  id               String             @id @default(uuid())
+  userId           String
+  user             User               @relation("LoginRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  requestedIp      String
+  currentAllowedIp String?
+  status           LoginRequestStatus @default(PENDING)
+  adminNote        String?
+  createdAt        DateTime           @default(now())
+  resolvedAt       DateTime?
+  resolvedById     String?
+  resolvedBy       User?              @relation("LoginRequestResolver", fields: [resolvedById], references: [id])
 }
 
 model BlogPost {

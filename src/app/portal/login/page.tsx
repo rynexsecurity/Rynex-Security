@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [ipBlocked, setIpBlocked] = useState<{ ip: string } | null>(null);
   const [loggedUser, setLoggedUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const router = useRouter();
 
@@ -27,6 +28,12 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+
+      if (res.status === 403 && data.error === 'IP_NOT_AUTHORIZED') {
+        setIpBlocked({ ip: data.requestedIp || 'unknown' });
+        setLoading(false);
+        return;
+      }
 
       if (!res.ok) {
         throw new Error(data.error || 'Invalid credentials');
@@ -141,7 +148,33 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className={styles.form}>
+          {ipBlocked && (
+            <div className={styles.ipBlockedBox}>
+              <div className={styles.ipBlockedHeader}>
+                <i className="fas fa-shield-exclamation" aria-hidden="true"></i>
+                <span>Login Blocked — Unauthorized IP</span>
+              </div>
+              <p className={styles.ipBlockedDesc}>
+                Your current IP address{' '}
+                <code className={styles.ipBlockedCode}>{ipBlocked.ip}</code>{' '}
+                is not authorized for this account.
+              </p>
+              <p className={styles.ipBlockedDesc}>
+                Your administrator has been notified. Once they approve your
+                request, you will be able to sign in from this IP address.
+              </p>
+              <button
+                type="button"
+                className={styles.ipBlockedRetry}
+                onClick={() => { setIpBlocked(null); setError(''); }}
+              >
+                <i className="fas fa-rotate-left" aria-hidden="true"></i>
+                Try a different account
+              </button>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className={`${styles.form} ${ipBlocked ? styles.formHidden : ''}`}>
             <div className={styles.inputGroup}>
               <label htmlFor="email" className={styles.label}>
                 Email address
