@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import styles from './EventPopup.module.css';
 
 export default function EventPopup() {
@@ -61,7 +60,7 @@ export default function EventPopup() {
           <div className={styles.statDivider} aria-hidden="true" />
           <div className={styles.stat}>
             <i className="fas fa-ticket" aria-hidden="true" />
-            <span>FREE</span>
+            <span>PKR 500</span>
           </div>
         </div>
 
@@ -89,12 +88,12 @@ export default function EventPopup() {
 
         {/* CTAs */}
         <div className={styles.ctaRow}>
-          <Link href="/events" className={styles.primaryCta} onClick={dismiss}>
-            <i className="fas fa-user-plus" aria-hidden="true" />
-            Register Now — FOR FREE
-          </Link>
+          <button type="button" className={styles.disabledCta} disabled>
+            <i className="fas fa-clock" aria-hidden="true" />
+            Event Coming Soon
+          </button>
           <button type="button" className={styles.secondaryCta} onClick={dismiss}>
-            Maybe Later
+            Close
           </button>
         </div>
 

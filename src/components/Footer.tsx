@@ -39,10 +39,9 @@ export default function Footer() {
                 <li><Link href="/">Home</Link></li>
                 <li><Link href="/about">About Us</Link></li>
                 <li><Link href="/services">Our Services</Link></li>
-                <li><Link href="/events">Events &amp; CTF</Link></li>
+                <li><Link href="/blog">Blog</Link></li>
               </ul>
               <ul className={styles.linksList}>
-                <li><Link href="/blog">Blog</Link></li>
                 <li><Link href="/careers">Careers</Link></li>
                 <li><Link href="/internship">Internship</Link></li>
                 <li><Link href="/contact">Contact Us</Link></li>

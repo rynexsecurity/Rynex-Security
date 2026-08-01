@@ -287,6 +287,8 @@ export default function Header() {
             </Link>
           </div>
 
+          {/* 
+          EVENTS NAV ITEM (Temporarily disabled - uncomment to re-enable in header):
           <div className={styles.navItem}>
             <Link
               href="/events"
@@ -298,6 +300,7 @@ export default function Header() {
               Events
             </Link>
           </div>
+          */}
 
           {/* 
           INTERNSHIP NAV ITEM (Temporarily disabled - uncomment to re-enable in header):

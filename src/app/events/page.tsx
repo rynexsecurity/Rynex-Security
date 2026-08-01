@@ -865,7 +865,7 @@ export default function EventsPage() {
                 setRegisterModalOpen(true);
               }}
             >
-              <i className="fas fa-bolt" /> Register Now — PKR 500
+              <i className="fas fa-bolt" /> Register Now — PKR FREE
             </button>
             <button
               type="button"

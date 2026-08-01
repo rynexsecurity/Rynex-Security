@@ -224,6 +224,23 @@
   gap: 0.65rem;
 }
 
+.disabledCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.5rem;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 10px;
+  color: #00d4ff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: not-allowed;
+  letter-spacing: 0.02em;
+  font-family: inherit;
+}
+
 .primaryCta {
   display: flex;
   align-items: center;

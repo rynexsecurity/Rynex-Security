@@ -36,29 +36,37 @@ export async function POST(req: Request) {
     });
 
     // Send internal team notification to Rynex Mail
-    await sendTeamNotification(
-      `🎯 NEW CTF REGISTRATION: ${name} (${organization || "Individual"}) — ${ticketToken}`,
-      `
-        <h2>New Competitor Registration for Rynex Eclipse 2026</h2>
-        <p><strong>Ticket Token:</strong> ${ticketToken}</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Group / Team / University:</strong> ${organization || "Individual"}</p>
-        <p><strong>Category:</strong> ${category}</p>
-        <p><strong>Registration Fee:</strong> PKR 500</p>
-      `,
-      email
-    );
+    try {
+      await sendTeamNotification(
+        `🎯 NEW CTF REGISTRATION: ${name} (${organization || "Individual"}) — ${ticketToken}`,
+        `
+          <h2>New Competitor Registration for Rynex Eclipse 2026</h2>
+          <p><strong>Ticket Token:</strong> ${ticketToken}</p>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Group / Team / University:</strong> ${organization || "Individual"}</p>
+          <p><strong>Category:</strong> ${category || "Competitor"}</p>
+          <p><strong>Registration Fee:</strong> FREE</p>
+        `,
+        email
+      );
+    } catch (err) {
+      console.error("[api/events/register] Error sending team notification:", err);
+    }
 
     // Send ticket confirmation email to the applicant
-    await sendEventRegistrationEmail({
-      to: email,
-      name,
-      ticketToken,
-      groupName: organization || "Individual",
-      category,
-    });
+    try {
+      await sendEventRegistrationEmail({
+        to: email.toLowerCase().trim(),
+        name,
+        ticketToken,
+        groupName: organization || "Individual",
+        category,
+      });
+    } catch (err) {
+      console.error("[api/events/register] Error sending ticket email:", err);
+    }
 
     return NextResponse.json({
       ok: true,

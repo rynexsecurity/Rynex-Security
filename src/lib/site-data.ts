@@ -7,7 +7,6 @@ export const primaryNav: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
-  { label: "Events", href: "/events" },
   { label: "Blog", href: "/blog" },
   { label: "Internship", href: "/internship" },
   { label: "Contact", href: "/contact" },
