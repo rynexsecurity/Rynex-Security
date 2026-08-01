@@ -7,13 +7,14 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2px;
-  padding: 5px 8px;
-  background: #f0f3f8;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #ffffff;
   border: 1px solid var(--portal-border);
   border-bottom: none;
   border-radius: var(--portal-radius) var(--portal-radius) 0 0;
   user-select: none;
+  font-family: var(--font-plex-sans), var(--portal-font), sans-serif;
 }
 
 /* ── Icon / label buttons ── */
@@ -21,27 +22,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: 1px solid transparent;
   border-radius: 4px;
   background: transparent;
-  color: #3d4a5c;
-  font-size: 13px;
+  color: #333333;
+  font-size: 14px;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition: all 120ms ease;
   padding: 0;
   line-height: 1;
+  font-family: var(--font-plex-sans), var(--portal-font), sans-serif;
 }
 
 .btn:hover {
-  background: #dce3ef;
-  border-color: #c5cdd9;
-  color: #1a2332;
+  background: #f0f2f5;
+  color: #000000;
 }
 
 .btn:active {
-  background: #c5cdd9;
+  background: #e2e8f0;
+}
+
+.btnActive {
+  background: #333333 !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+.btnActive:hover {
+  background: #111111 !important;
+  color: #ffffff !important;
 }
 
 /* Image button — accent highlight */
@@ -57,9 +69,9 @@
 
 /* H1/H2/H3 label buttons — slightly wider */
 .labelBtn {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  font-family: var(--portal-font, sans-serif);
+  font-family: var(--font-plex-sans), var(--portal-font), sans-serif;
   letter-spacing: -0.02em;
 }
 
@@ -485,3 +497,148 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* ── Dropdown wrappers & Menus ── */
+.dropdownWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms ease;
+  font-family: var(--font-plex-sans), var(--portal-font), sans-serif;
+  user-select: none;
+}
+
+.dropdownToggle:hover {
+  background: #f0f2f5;
+}
+
+.dropdownChevron {
+  font-size: 8px;
+  color: #718096;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+  min-width: 150px;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  animation: dropdownFadeIn 150ms ease;
+}
+
+.dropdownMenuRight {
+  left: auto;
+  right: 0;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  color: #2d3748;
+  cursor: pointer;
+  transition: background 100ms ease;
+  font-family: var(--font-plex-sans), var(--portal-font), sans-serif;
+}
+
+.dropdownItem:hover {
+  background: #f7fafc;
+  color: #000000;
+}
+
+/* ── Color Pickers ── */
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 10px;
+  min-width: 150px;
+  background: #ffffff;
+}
+
+.colorSwatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.18);
+  border-color: #4a5568;
+}
+
+/* ── Emoji Picker ── */
+.emojiGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  padding: 10px;
+  background: #ffffff;
+  min-width: 220px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.emojiBtn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 100ms ease, transform 100ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiBtn:hover {
+  background: #f7fafc;
+  transform: scale(1.15);
+}
+
+/* ── Custom Layouts ── */
+.undoRedoGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+

@@ -1,12 +1,45 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './ImageInsertBar.module.css';
 
 interface Props {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   onContentChange: (newValue: string) => void;
 }
+
+/* ── helper lists ── */
+const COLORS = [
+  { name: 'Black', hex: '#000000' },
+  { name: 'Grey', hex: '#718096' },
+  { name: 'Red', hex: '#e53e3e' },
+  { name: 'Orange', hex: '#dd6b20' },
+  { name: 'Yellow', hex: '#ecc94b' },
+  { name: 'Green', hex: '#38a169' },
+  { name: 'Blue', hex: '#3182ce' },
+  { name: 'Purple', hex: '#805ad5' },
+  { name: 'Pink', hex: '#d53f8c' },
+  { name: 'White', hex: '#ffffff' }
+];
+
+const HIGHLIGHTS = [
+  { name: 'Light Grey', hex: '#e2e8f0' },
+  { name: 'Light Red', hex: '#fed7d7' },
+  { name: 'Light Orange', hex: '#feebc8' },
+  { name: 'Light Yellow', hex: '#fefcbf' },
+  { name: 'Light Green', hex: '#c6f6d5' },
+  { name: 'Light Blue', hex: '#bee3f8' },
+  { name: 'Light Purple', hex: '#e9d8fd' },
+  { name: 'Light Pink', hex: '#fed7e2' },
+  { name: 'Clear Highlight', hex: '#ffffff' }
+];
+
+const EMOJIS = [
+  '😀', '😂', '😍', '👍', '🎉', '🔥', 
+  '🚀', '💻', '🔒', '🛡️', '💡', '📌', 
+  '✅', '❌', '⚠️', '👀', '🌟', '👏',
+  '🙌', '❤️', '🤔', '💬', '📢', '🌍'
+];
 
 /* ── helpers ── */
 function insertAround(
@@ -66,7 +99,104 @@ export default function MarkdownToolbar({ textareaRef, onContentChange }: Props)
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
 
+  /* dropdown states */
+  const [openDropdown, setOpenDropdown] = useState<'image' | 'heading' | 'color' | 'highlight' | 'emoji' | 'more' | null>(null);
+  const [currentFormat, setCurrentFormat] = useState('Main text 2');
+  const [activeAlign, setActiveAlign] = useState<'left' | 'center' | 'right' | 'justify'>('left');
+
+  /* undo/redo history states */
+  const historyRef = useRef<string[]>([]);
+  const historyIndexRef = useRef<number>(-1);
+
   const ta = () => textareaRef.current!;
+
+  /* setup click outside to close dropdowns */
+  useEffect(() => {
+    const handleGlobalClick = () => {
+      setOpenDropdown(null);
+    };
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
+
+  /* capture manual edits for undo/redo */
+  useEffect(() => {
+    const taEl = textareaRef.current;
+    if (!taEl) return;
+
+    if (historyRef.current.length === 0) {
+      historyRef.current = [taEl.value];
+      historyIndexRef.current = 0;
+    }
+
+    let timeoutId: any;
+    const handleInput = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const currentVal = taEl.value;
+        const hist = historyRef.current;
+        const idx = historyIndexRef.current;
+        if (hist[idx] !== currentVal) {
+          const newHist = hist.slice(0, idx + 1);
+          newHist.push(currentVal);
+          historyRef.current = newHist;
+          historyIndexRef.current = newHist.length - 1;
+        }
+      }, 400);
+    };
+
+    taEl.addEventListener('input', handleInput);
+    return () => {
+      taEl.removeEventListener('input', handleInput);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [textareaRef]);
+
+  const saveToHistory = (newVal: string) => {
+    const hist = historyRef.current;
+    const idx = historyIndexRef.current;
+    if (hist[idx] === newVal) return;
+    const newHist = hist.slice(0, idx + 1);
+    newHist.push(newVal);
+    historyRef.current = newHist;
+    historyIndexRef.current = newHist.length - 1;
+  };
+
+  const handleUndo = () => {
+    if (historyIndexRef.current > 0) {
+      historyIndexRef.current -= 1;
+      const prevVal = historyRef.current[historyIndexRef.current];
+      onContentChange(prevVal);
+      requestAnimationFrame(() => {
+        ta().focus();
+      });
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      historyIndexRef.current += 1;
+      const nextVal = historyRef.current[historyIndexRef.current];
+      onContentChange(nextVal);
+      requestAnimationFrame(() => {
+        ta().focus();
+      });
+    }
+  };
+
+  const executeAround = (before: string, after: string, placeholder: string) => {
+    insertAround(ta(), before, after, placeholder, (newVal) => {
+      onContentChange(newVal);
+      saveToHistory(newVal);
+    });
+  };
+
+  const executeBlock = (block: string) => {
+    insertBlock(ta(), block, (newVal) => {
+      onContentChange(newVal);
+      saveToHistory(newVal);
+    });
+  };
 
   /* build the final markdown/html for the image */
   const buildImageMarkdown = (url: string, alt: string, align: 'left' | 'center' | 'right') => {
@@ -100,6 +230,18 @@ export default function MarkdownToolbar({ textareaRef, onContentChange }: Props)
   const closeImageModal = () => {
     setImageModalOpen(false);
     setUploading(false);
+  };
+
+  const handleImageDropdownAction = (tab: 'url' | 'upload') => {
+    setImgTab(tab);
+    setImgUrl('');
+    setImgAlt('');
+    setImgAlign('center');
+    setImgPreviewErr(false);
+    setUploadedUrl('');
+    setUploadErr('');
+    setImageModalOpen(true);
+    setOpenDropdown(null);
   };
 
   /* file upload handler */
@@ -136,81 +278,109 @@ export default function MarkdownToolbar({ textareaRef, onContentChange }: Props)
     setLinkModalOpen(false);
   };
 
-  /* toolbar definition */
-  const tools = [
-    {
-      group: 'format',
-      items: [
-        { icon: 'fa-bold',          title: 'Bold',          action: () => insertAround(ta(), '**', '**', 'bold text', onContentChange) },
-        { icon: 'fa-italic',        title: 'Italic',        action: () => insertAround(ta(), '_', '_', 'italic text', onContentChange) },
-        { icon: 'fa-strikethrough', title: 'Strikethrough', action: () => insertAround(ta(), '~~', '~~', 'text', onContentChange) },
-        { icon: 'fa-code',          title: 'Inline code',   action: () => insertAround(ta(), '`', '`', 'code', onContentChange) },
-      ],
-    },
-    {
-      group: 'headings',
-      items: [
-        { label: 'H1', title: 'Heading 1', action: () => insertBlock(ta(), '# Heading', onContentChange) },
-        { label: 'H2', title: 'Heading 2', action: () => insertBlock(ta(), '## Heading', onContentChange) },
-        { label: 'H3', title: 'Heading 3', action: () => insertBlock(ta(), '### Heading', onContentChange) },
-      ],
-    },
-    {
-      group: 'lists',
-      items: [
-        { icon: 'fa-list-ul',     title: 'Bullet list',  action: () => insertBlock(ta(), '- List item', onContentChange) },
-        { icon: 'fa-list-ol',     title: 'Ordered list', action: () => insertBlock(ta(), '1. List item', onContentChange) },
-      ],
-    },
-    {
-      group: 'blocks',
-      items: [
-        { icon: 'fa-quote-right', title: 'Blockquote',    action: () => insertBlock(ta(), '> Blockquote', onContentChange) },
-        { icon: 'fa-minus',       title: 'Divider (---)', action: () => insertBlock(ta(), '---', onContentChange) },
-        { icon: 'fa-file-code',   title: 'Code block',    action: () => insertBlock(ta(), '```\ncode here\n```', onContentChange) },
-        {
-          label: 'Drop Cap',
-          title: 'Drop Cap — large first letter (magazine style). Select the first letter first, or it inserts a placeholder.',
-          action: () => {
-            const taEl = textareaRef.current;
-            if (!taEl) return;
-            const start = taEl.selectionStart;
-            const end = taEl.selectionEnd;
-            const selected = taEl.value.slice(start, end);
-            // If a single letter is selected use it, otherwise use placeholder
-            const letter = selected.length === 1 ? selected : 'A';
-            const before = taEl.value.slice(0, start);
-            const after = taEl.value.slice(end);
-            const snippet = `<span class="drop-cap">${letter}</span>`;
-            onContentChange(before + snippet + after);
-            requestAnimationFrame(() => {
-              taEl.focus();
-              taEl.setSelectionRange(before.length + snippet.length, before.length + snippet.length);
-            });
-          },
-        },
-      ],
-    },
-    {
-      group: 'media',
-      items: [
-        {
-          icon: 'fa-link',
-          title: 'Insert link',
-          action: () => {
-            const sel = textareaRef.current?.value.slice(
-              textareaRef.current.selectionStart,
-              textareaRef.current.selectionEnd
-            ) || '';
-            setLinkText(sel);
-            setLinkUrl('');
-            setLinkModalOpen(true);
-          },
-        },
-        { icon: 'fa-image', title: 'Insert image', action: openImageModal, highlight: true },
-      ],
-    },
-  ];
+  /* actions */
+  const applyHeading = (level: string) => {
+    const taEl = ta();
+    const start = taEl.selectionStart;
+    const end = taEl.selectionEnd;
+    const value = taEl.value;
+
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+    let lineEnd = value.indexOf('\n', end);
+    if (lineEnd === -1) lineEnd = value.length;
+
+    const currentLine = value.slice(lineStart, lineEnd);
+    const cleanLine = currentLine.replace(/^#+\s*/, '');
+
+    let newlinePrefix = '';
+    if (level === 'H1') newlinePrefix = '# ';
+    else if (level === 'H2') newlinePrefix = '## ';
+    else if (level === 'H3') newlinePrefix = '### ';
+
+    const newLine = newlinePrefix + cleanLine;
+    const newVal = value.slice(0, lineStart) + newLine + value.slice(lineEnd);
+    onContentChange(newVal);
+    saveToHistory(newVal);
+
+    setCurrentFormat(
+      level === 'H1' ? 'Heading 1' : 
+      level === 'H2' ? 'Heading 2' : 
+      level === 'H3' ? 'Heading 3' : 
+      level === 'M1' ? 'Main text 1' : 'Main text 2'
+    );
+
+    requestAnimationFrame(() => {
+      taEl.focus();
+      taEl.setSelectionRange(lineStart + newlinePrefix.length, lineStart + newLine.length);
+    });
+    setOpenDropdown(null);
+  };
+
+  const applyAlignment = (align: 'left' | 'center' | 'right' | 'justify') => {
+    const taEl = ta();
+    const start = taEl.selectionStart;
+    const end = taEl.selectionEnd;
+    
+    let before = '';
+    let after = '';
+    if (align !== 'left') {
+      before = `<div style="text-align: ${align}">\n`;
+      after = '\n</div>';
+    } else {
+      before = '<div style="text-align: left">\n';
+      after = '\n</div>';
+    }
+
+    insertAround(taEl, before, after, 'aligned text', (newVal) => {
+      onContentChange(newVal);
+      saveToHistory(newVal);
+    });
+    setActiveAlign(align);
+  };
+
+  const insertEmoji = (emoji: string) => {
+    const taEl = ta();
+    const pos = taEl.selectionStart;
+    const newVal = taEl.value.slice(0, pos) + emoji + taEl.value.slice(pos);
+    onContentChange(newVal);
+    saveToHistory(newVal);
+    requestAnimationFrame(() => {
+      taEl.focus();
+      taEl.setSelectionRange(pos + emoji.length, pos + emoji.length);
+    });
+    setOpenDropdown(null);
+  };
+
+  const insertTable = () => {
+    const tableTemplate = `\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n`;
+    executeBlock(tableTemplate);
+  };
+
+  const insertLocation = () => {
+    const loc = prompt('Enter location (e.g. London, UK):');
+    if (loc && loc.trim()) {
+      executeBlock(`📍 **${loc.trim()}**`);
+    }
+  };
+
+  const applyDropCap = () => {
+    const taEl = ta();
+    const start = taEl.selectionStart;
+    const end = taEl.selectionEnd;
+    const selected = taEl.value.slice(start, end);
+    const letter = selected.length === 1 ? selected : 'A';
+    const snippet = `<span class="drop-cap">${letter}</span>`;
+    const before = taEl.value.slice(0, start);
+    const after = taEl.value.slice(end);
+    const newVal = before + snippet + after;
+    onContentChange(newVal);
+    saveToHistory(newVal);
+    requestAnimationFrame(() => {
+      taEl.focus();
+      taEl.setSelectionRange(before.length + snippet.length, before.length + snippet.length);
+    });
+    setOpenDropdown(null);
+  };
 
   /* preview url shown in the modal */
   const previewUrl = activeUrl;
@@ -219,26 +389,339 @@ export default function MarkdownToolbar({ textareaRef, onContentChange }: Props)
     <>
       {/* ── Toolbar ── */}
       <div className={styles.toolbar} role="toolbar" aria-label="Markdown editor toolbar">
-        {tools.map((group, gi) => (
-          <React.Fragment key={group.group}>
-            {gi > 0 && <span className={styles.divider} aria-hidden="true" />}
-            {group.items.map((item) => (
-              <button
-                key={item.title}
-                type="button"
-                className={`${styles.btn} ${(item as any).highlight ? styles.btnAccent : ''}`}
-                title={item.title}
-                aria-label={item.title}
-                onClick={item.action}
-              >
-                {(item as any).icon
-                  ? <i className={`fas ${(item as any).icon}`} aria-hidden="true" />
-                  : <span className={styles.labelBtn}>{(item as any).label}</span>
-                }
+        
+        {/* 1. Image Dropdown */}
+        <div className={styles.dropdownWrapper} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={styles.dropdownToggle}
+            onClick={() => setOpenDropdown(openDropdown === 'image' ? null : 'image')}
+            title="Insert Image"
+          >
+            <i className="fas fa-image" style={{ color: 'var(--portal-accent)' }} />
+            <i className={`fas fa-chevron-down ${styles.dropdownChevron}`} />
+          </button>
+          {openDropdown === 'image' && (
+            <div className={styles.dropdownMenu}>
+              <button type="button" className={styles.dropdownItem} onClick={() => handleImageDropdownAction('upload')}>
+                <i className="fas fa-upload" style={{ marginRight: '6px' }} /> Upload from device
               </button>
-            ))}
-          </React.Fragment>
-        ))}
+              <button type="button" className={styles.dropdownItem} onClick={() => handleImageDropdownAction('url')}>
+                <i className="fas fa-link" style={{ marginRight: '6px' }} /> Insert from URL
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 2. Format / Heading Dropdown */}
+        <div className={styles.dropdownWrapper} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={styles.dropdownToggle}
+            onClick={() => setOpenDropdown(openDropdown === 'heading' ? null : 'heading')}
+            title="Heading Style"
+            style={{ minWidth: '100px', justifyContent: 'space-between' }}
+          >
+            <span>{currentFormat}</span>
+            <i className={`fas fa-chevron-down ${styles.dropdownChevron}`} />
+          </button>
+          {openDropdown === 'heading' && (
+            <div className={styles.dropdownMenu}>
+              <button type="button" className={styles.dropdownItem} onClick={() => applyHeading('M1')}>Main text 1</button>
+              <button type="button" className={styles.dropdownItem} onClick={() => applyHeading('M2')}>Main text 2</button>
+              <button type="button" className={styles.dropdownItem} onClick={() => applyHeading('H1')}>Heading 1</button>
+              <button type="button" className={styles.dropdownItem} onClick={() => applyHeading('H2')}>Heading 2</button>
+              <button type="button" className={styles.dropdownItem} onClick={() => applyHeading('H3')}>Heading 3</button>
+            </div>
+          )}
+        </div>
+
+        {/* 3. Undo/Redo */}
+        <div className={styles.undoRedoGroup}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={handleUndo}
+            title="Undo"
+            disabled={historyIndexRef.current <= 0}
+          >
+            <i className="fas fa-undo" />
+          </button>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={handleRedo}
+            title="Redo"
+            disabled={historyIndexRef.current >= historyRef.current.length - 1}
+          >
+            <i className="fas fa-redo" />
+          </button>
+        </div>
+
+        {/* 4. Bold */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeAround('**', '**', 'bold text')}
+          title="Bold"
+          style={{ fontWeight: 'bold' }}
+        >
+          B
+        </button>
+
+        {/* 5. Italic */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeAround('_', '_', 'italic text')}
+          title="Italic"
+          style={{ fontStyle: 'italic' }}
+        >
+          I
+        </button>
+
+        {/* 6. Underline */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeAround('<u>', '</u>', 'underlined text')}
+          title="Underline"
+          style={{ textDecoration: 'underline' }}
+        >
+          U
+        </button>
+
+        {/* 7. Strikethrough */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeAround('~~', '~~', 'strikethrough text')}
+          title="Strikethrough"
+        >
+          <span style={{ textDecoration: 'line-through' }}>T</span>
+        </button>
+
+        {/* 8. Text Color Picker */}
+        <div className={styles.dropdownWrapper} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => setOpenDropdown(openDropdown === 'color' ? null : 'color')}
+            title="Text Color"
+          >
+            <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+              T<span style={{ position: 'absolute', bottom: -2, right: -4, fontSize: '12px', color: '#e53e3e' }}>•</span>
+            </span>
+          </button>
+          {openDropdown === 'color' && (
+            <div className={`${styles.dropdownMenu} ${styles.colorGrid}`}>
+              {COLORS.map((c) => (
+                <button
+                  key={c.hex}
+                  type="button"
+                  className={styles.colorSwatch}
+                  style={{ backgroundColor: c.hex }}
+                  title={c.name}
+                  onClick={() => {
+                    executeAround(`<span style="color: ${c.hex}">`, '</span>', 'colored text');
+                    setOpenDropdown(null);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 9. Background Highlight Picker */}
+        <div className={styles.dropdownWrapper} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => setOpenDropdown(openDropdown === 'highlight' ? null : 'highlight')}
+            title="Highlight Color"
+          >
+            <span style={{ border: '1px solid #718096', padding: '1px 3px', borderRadius: '2px', fontSize: '11px', fontWeight: 'bold', lineHeight: 1 }}>T</span>
+          </button>
+          {openDropdown === 'highlight' && (
+            <div className={`${styles.dropdownMenu} ${styles.colorGrid}`}>
+              {HIGHLIGHTS.map((c) => (
+                <button
+                  key={c.hex}
+                  type="button"
+                  className={styles.colorSwatch}
+                  style={{ backgroundColor: c.hex }}
+                  title={c.name}
+                  onClick={() => {
+                    if (c.hex === '#ffffff') {
+                      executeAround('<span style="background-color: transparent">', '</span>', 'text');
+                    } else {
+                      executeAround(`<span style="background-color: ${c.hex}">`, '</span>', 'highlighted text');
+                    }
+                    setOpenDropdown(null);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <span className={styles.divider} aria-hidden="true" />
+
+        {/* 10. Alignment Toggles */}
+        <button
+          type="button"
+          className={`${styles.btn} ${activeAlign === 'left' ? styles.btnActive : ''}`}
+          onClick={() => applyAlignment('left')}
+          title="Align Left"
+        >
+          <i className="fas fa-align-left" />
+        </button>
+        <button
+          type="button"
+          className={`${styles.btn} ${activeAlign === 'center' ? styles.btnActive : ''}`}
+          onClick={() => applyAlignment('center')}
+          title="Align Center"
+        >
+          <i className="fas fa-align-center" />
+        </button>
+        <button
+          type="button"
+          className={`${styles.btn} ${activeAlign === 'right' ? styles.btnActive : ''}`}
+          onClick={() => applyAlignment('right')}
+          title="Align Right"
+        >
+          <i className="fas fa-align-right" />
+        </button>
+        <button
+          type="button"
+          className={`${styles.btn} ${activeAlign === 'justify' ? styles.btnActive : ''}`}
+          onClick={() => applyAlignment('justify')}
+          title="Justify Text"
+        >
+          <i className="fas fa-align-justify" />
+        </button>
+
+        <span className={styles.divider} aria-hidden="true" />
+
+        {/* 11. Quote (66) */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeBlock('> Blockquote')}
+          title="Blockquote"
+        >
+          <span style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', fontSize: '18px', lineHeight: 1 }}>“</span>
+        </button>
+
+        {/* 12. Emoji Popover */}
+        <div className={styles.dropdownWrapper} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => setOpenDropdown(openDropdown === 'emoji' ? null : 'emoji')}
+            title="Insert Emoji"
+          >
+            <i className="far fa-smile" />
+          </button>
+          {openDropdown === 'emoji' && (
+            <div className={`${styles.dropdownMenu} ${styles.emojiGrid}`}>
+              {EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className={styles.emojiBtn}
+                  onClick={() => insertEmoji(emoji)}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 13. Table */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={insertTable}
+          title="Insert Table"
+        >
+          <i className="fas fa-th-large" />
+        </button>
+
+        {/* 14. Link */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => {
+            const sel = textareaRef.current?.value.slice(
+              textareaRef.current.selectionStart,
+              textareaRef.current.selectionEnd
+            ) || '';
+            setLinkText(sel);
+            setLinkUrl('');
+            setLinkModalOpen(true);
+          }}
+          title="Insert Link"
+        >
+          <i className="fas fa-link" />
+        </button>
+
+        {/* 15. Bullet list */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeBlock('- List item')}
+          title="Bullet List"
+        >
+          <i className="fas fa-list-ul" />
+        </button>
+
+        {/* 16. Horizontal line (—) */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={() => executeBlock('---')}
+          title="Horizontal Line"
+        >
+          <span>—</span>
+        </button>
+
+        {/* 17. More options dropdown (...) */}
+        <div className={styles.dropdownWrapper} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => setOpenDropdown(openDropdown === 'more' ? null : 'more')}
+            title="More Formatting Options"
+          >
+            <i className="fas fa-ellipsis-h" />
+          </button>
+          {openDropdown === 'more' && (
+            <div className={`${styles.dropdownMenu} ${styles.dropdownMenuRight}`}>
+              <button type="button" className={styles.dropdownItem} onClick={applyDropCap}>
+                <i className="fas fa-heading" style={{ marginRight: '6px' }} /> Drop Cap
+              </button>
+              <button type="button" className={styles.dropdownItem} onClick={() => executeAround('`', '`', 'code')}>
+                <i className="fas fa-code" style={{ marginRight: '6px' }} /> Inline Code
+              </button>
+              <button type="button" className={styles.dropdownItem} onClick={() => executeBlock('```\ncode here\n```')}>
+                <i className="fas fa-file-code" style={{ marginRight: '6px' }} /> Code Block
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 18. Pin/Location */}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={insertLocation}
+          title="Insert Location"
+        >
+          <i className="fas fa-map-marker-alt" />
+        </button>
+
       </div>
 
       {/* ── Image modal ── */}
