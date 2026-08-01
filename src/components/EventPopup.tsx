@@ -91,7 +91,7 @@ export default function EventPopup() {
         <div className={styles.ctaRow}>
           <Link href="/events" className={styles.primaryCta} onClick={dismiss}>
             <i className="fas fa-user-plus" aria-hidden="true" />
-            Register Now — PKR 500
+            Register Now — FOR FREE
           </Link>
           <button type="button" className={styles.secondaryCta} onClick={dismiss}>
             Maybe Later

@@ -272,27 +272,10 @@ export function buildInternshipConfirmationEmail(name: string) {
                   style="
                     font-size:14px;
                     color:#cbd5e1;
-                    margin-bottom:8px;
                   "
                 >
                   Offensive Security • Penetration Testing • Cloud Security
                 </div>
-
-                <a
-                  href="${WEBSITE_URL}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style="
-                    display:inline-block;
-                    color:#00c2ff;
-                    text-decoration:none;
-                    font-size:14px;
-                  "
-                >
-                  ${WEBSITE_URL}
-                </a>
-
-
               </td>
             </tr>
           </table>

@@ -148,8 +148,7 @@ export function buildContactConfirmationEmail(name: string) {
                     line-height:1.7;
                   "
                 >
-                  Thank you for contacting Rynex Security. Your message has
-                  been received successfully.
+                  Your message has been received successfully.
                 </p>
 
                 <p
@@ -160,56 +159,26 @@ export function buildContactConfirmationEmail(name: string) {
                     line-height:1.7;
                   "
                 >
-                  Our team will review your request and respond as soon as
+                  Our team will review your inquiry and contact you as soon as
                   possible.
                 </p>
 
                 <p
                   style="
-                    margin:0 0 24px 0;
+                    margin:0 0 16px 0;
                     font-size:16px;
                     color:#374151;
                     line-height:1.7;
                   "
                 >
-                  Please keep this email as confirmation that your message was
-                  submitted.
+                  If you have any questions, feel free to reply to us at
+                  <a
+                    href="mailto:${CONTACT_EMAIL}"
+                    style="color:#2563eb;text-decoration:none;"
+                  >
+                    ${CONTACT_EMAIL}
+                  </a>.
                 </p>
-
-                <table
-                  role="presentation"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  style="margin:28px auto;"
-                >
-                  <tr>
-                    <td
-                      align="center"
-                      style="
-                        background-color:#00c2ff;
-                        border-radius:8px;
-                      "
-                    >
-                      <a
-                        href="${WEBSITE_URL}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style="
-                          display:inline-block;
-                          padding:14px 24px;
-                          color:#000000;
-                          font-size:16px;
-                          font-weight:bold;
-                          text-decoration:none;
-                          border-radius:8px;
-                        "
-                      >
-                        Visit Rynex Security
-                      </a>
-                    </td>
-                  </tr>
-                </table>
 
                 <p
                   style="
@@ -219,13 +188,7 @@ export function buildContactConfirmationEmail(name: string) {
                     line-height:1.7;
                   "
                 >
-                  For additional questions, contact us at
-                  <a
-                    href="mailto:${CONTACT_EMAIL}"
-                    style="color:#2563eb;text-decoration:none;"
-                  >
-                    ${CONTACT_EMAIL}
-                  </a>.
+                  Thank you and see you soon.
                 </p>
               </td>
             </tr>
@@ -253,27 +216,10 @@ export function buildContactConfirmationEmail(name: string) {
                   style="
                     font-size:14px;
                     color:#cbd5e1;
-                    margin-bottom:8px;
                   "
                 >
                   Offensive Security • Penetration Testing • Cloud Security
                 </div>
-
-                <a
-                  href="${WEBSITE_URL}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style="
-                    display:inline-block;
-                    color:#00c2ff;
-                    text-decoration:none;
-                    font-size:14px;
-                  "
-                >
-                  ${WEBSITE_URL}
-                </a>
-
-
               </td>
             </tr>
           </table>
@@ -285,11 +231,11 @@ export function buildContactConfirmationEmail(name: string) {
 
   const text = `Dear ${cleanedName},
 
-Thank you for contacting Rynex Security.
+Your message has been received successfully.
 
-Your message has been received successfully. Our team will review your request and respond as soon as possible.
+Our team will review your inquiry and contact you as soon as possible.
 
-Website: ${WEBSITE_URL}
+Thank you.
 Email: ${CONTACT_EMAIL}
 
 Rynex Security
