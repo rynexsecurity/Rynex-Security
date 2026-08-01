@@ -299,6 +299,18 @@ export default function Header() {
             </Link>
           </div>
 
+          <div className={styles.navItem}>
+            <Link
+              href="/test"
+              className={`${styles.navLink} ${
+                isActive("/test") ? styles.active : ""
+              }`}
+              onClick={closeNavigation}
+            >
+              Test
+            </Link>
+          </div>
+
           {/* 
           INTERNSHIP NAV ITEM (Temporarily disabled - uncomment to re-enable in header):
           <div className={styles.navItem}>
