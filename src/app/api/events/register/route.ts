@@ -36,29 +36,25 @@ export async function POST(req: Request) {
     });
 
     // Send internal team notification to Rynex Mail
-    await sendTeamNotification(
-      `🎯 NEW CTF REGISTRATION: ${name} (${organization || "Individual"}) — ${ticketToken}`,
-      `
-        <h2>New Competitor Registration for Rynex Eclipse 2026</h2>
-        <p><strong>Ticket Token:</strong> ${ticketToken}</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Group / Team / University:</strong> ${organization || "Individual"}</p>
-        <p><strong>Category:</strong> ${category}</p>
-        <p><strong>Registration Fee:</strong> PKR 500</p>
-      `,
-      email
-    );
-
-    // Send ticket confirmation email to the applicant
-    await sendEventRegistrationEmail({
-      to: email,
-      name,
-      ticketToken,
-      groupName: organization || "Individual",
-      category,
-    });
+    try {
+      await sendTeamNotification(
+        `🎯 NEW CTF REGISTRATION: ${name} (${organization || "Individual"}) — ${ticketToken}`,
+        `
+          <h2>New Competitor Registration for Rynex Eclipse 2026</h2>
+          <p><strong>Ticket Token:</strong> ${ticketToken}</p>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Group / Team / University:</strong> ${organization || "Individual"}</p>
+          <p><strong>Category:</strong> ${category}</p>
+          <p><strong>Registration Fee:</strong> Free</p>
+          <p><strong>Status:</strong> PENDING (Awaiting Admin Approval in Portal)</p>
+        `,
+        email
+      );
+    } catch (teamErr) {
+      console.error("[api/events/register] Error sending team notification:", teamErr);
+    }
 
     return NextResponse.json({
       ok: true,

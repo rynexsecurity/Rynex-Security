@@ -61,7 +61,7 @@ export default function EventPopup() {
           <div className={styles.statDivider} aria-hidden="true" />
           <div className={styles.stat}>
             <i className="fas fa-ticket" aria-hidden="true" />
-            <span>PKR 500</span>
+            <span>Free Entry</span>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ export default function EventPopup() {
         <div className={styles.ctaRow}>
           <Link href="/events" className={styles.primaryCta} onClick={dismiss}>
             <i className="fas fa-user-plus" aria-hidden="true" />
-            Register Now — PKR 500
+            Register Now (Free)
           </Link>
           <button type="button" className={styles.secondaryCta} onClick={dismiss}>
             Maybe Later

@@ -1188,3 +1188,205 @@
   border-radius: 6px;
   margin: 20px 0;
 }
+
+/* ── Championship Prize Pool ─────────────────────────── */
+.prizePoolGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  align-items: stretch;
+  max-width: 1080px;
+  margin: 40px auto 0;
+}
+
+.prizeCard {
+  background: var(--white);
+  border: 1px solid var(--gray-20);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+:global([data-theme="dark"]) .prizeCard {
+  background: rgba(13, 19, 34, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px);
+}
+
+.prizeCard:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* First Place (Gold Accent) */
+.firstPlaceCard {
+  border-top: 4px solid #ffd700 !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.firstPlaceCard:hover {
+  border-color: #ffd700 !important;
+  box-shadow: 0 20px 40px rgba(255, 215, 0, 0.15), 0 0 20px rgba(255, 215, 0, 0.1) !important;
+}
+
+:global([data-theme="dark"]) .firstPlaceCard {
+  background: rgba(255, 215, 0, 0.03) !important;
+}
+
+/* Second Place (Silver Accent) */
+.secondPlaceCard {
+  border-top: 4px solid #c0c0c0 !important;
+}
+
+.secondPlaceCard:hover {
+  border-color: #c0c0c0 !important;
+  box-shadow: 0 20px 40px rgba(192, 192, 192, 0.15), 0 0 20px rgba(192, 192, 192, 0.1) !important;
+}
+
+:global([data-theme="dark"]) .secondPlaceCard {
+  background: rgba(192, 192, 192, 0.02) !important;
+}
+
+/* Third Place (Bronze Accent) */
+.thirdPlaceCard {
+  border-top: 4px solid #cd7f32 !important;
+}
+
+.thirdPlaceCard:hover {
+  border-color: #cd7f32 !important;
+  box-shadow: 0 20px 40px rgba(205, 127, 50, 0.15), 0 0 20px rgba(205, 127, 50, 0.1) !important;
+}
+
+:global([data-theme="dark"]) .thirdPlaceCard {
+  background: rgba(205, 127, 50, 0.02) !important;
+}
+
+/* Card content styles */
+.prizeIconWrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin-bottom: 24px;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.prizeCard:hover .prizeIconWrapper {
+  transform: rotate(-10deg) scale(1.1);
+}
+
+.firstPlaceIcon {
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.secondPlaceIcon {
+  background: rgba(192, 192, 192, 0.1);
+  color: #c0c0c0;
+  border: 1px solid rgba(192, 192, 192, 0.3);
+  box-shadow: 0 0 20px rgba(192, 192, 192, 0.15);
+}
+
+.thirdPlaceIcon {
+  background: rgba(205, 127, 50, 0.1);
+  color: #cd7f32;
+  border: 1px solid rgba(205, 127, 50, 0.3);
+  box-shadow: 0 0 20px rgba(205, 127, 50, 0.15);
+}
+
+.prizeBadge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.firstBadge {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.secondBadge {
+  background: rgba(192, 192, 192, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.thirdBadge {
+  background: rgba(205, 127, 50, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(205, 127, 50, 0.3);
+}
+
+.prizeTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-100);
+  margin-bottom: 8px;
+}
+
+:global([data-theme="dark"]) .prizeTitle {
+  color: #ffffff !important;
+}
+
+.prizeValue {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--cyan-text);
+  font-family: var(--font-mono);
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.prizeDivider {
+  width: 60px;
+  height: 2px;
+  background: var(--gray-20);
+  margin: 16px 0;
+}
+
+:global([data-theme="dark"]) .prizeDivider {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.prizeFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--gray-70);
+  font-size: 0.95rem;
+}
+
+:global([data-theme="dark"]) .prizeFeatures {
+  color: #cbd5e1 !important;
+}
+
+.prizeFeatures li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prizeFeatures i {
+  color: #00ffaa;
+  font-size: 0.85rem;
+}

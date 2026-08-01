@@ -316,13 +316,13 @@ export default function EventsPage() {
     if (lowerCmd === "help") {
       output = `[*] Available Rynex CTF Terminal Commands:\n - help         : Show available terminal commands\n - status       : View event date, venue, fee & registration status\n - tracks       : List CTF challenge categories (Web, Forensics, Reversing, Network)\n - rules        : CTF competition guidelines & flag submission format\n - prizes       : View prize pool, cash awards & trophy details\n - register     : Open competitor pre-registration form directly\n - sponsor      : Open sponsorship inquiry modal directly\n - submit <flag>: Submit CTF flag (Try flag: RYNEX{3cl1ps3_2026_c4ptur3d})\n - whoami       : Show current visitor session info\n - clear        : Clear terminal screen`;
     } else if (lowerCmd === "status") {
-      output = `[+] EVENT: Rynex Eclipse 2026 (Jeopardy CTF)\n[+] STATUS: Pre-Registration Active\n[+] VENUE: Rahim Yar Khan, Pakistan\n[+] FEE: PKR 500 per participant\n[+] ELIGIBILITY: Open to Students, Pros, Ethical Hackers & Developers`;
+      output = `[+] EVENT: Rynex Eclipse 2026 (Jeopardy CTF)\n[+] STATUS: Pre-Registration Active\n[+] VENUE: Rahim Yar Khan, Pakistan\n[+] FEE: Free Entry\n[+] ELIGIBILITY: Open to Students, Pros, Ethical Hackers & Developers`;
     } else if (lowerCmd === "tracks" || lowerCmd === "categories") {
       output = `[+] 1. WEB EXPLOITATION   (OWASP Top 10, API Hacking, XSS, SQLi, JWT)\n[+] 2. DIGITAL FORENSICS  (Network PCAP, RAM Dumps, Metadata Analysis)\n[+] 3. REVERSE ENG        (Assembly, Ghidra, Decompilation, Anti-Debug)\n[+] 4. NETWORK SECURITY   (Wireshark, Encrypted Channels, Pivoting)`;
     } else if (lowerCmd === "rules") {
       output = `[*] RYNEX ECLIPSE CTF RULES:\n 1. Flag format: RYNEX{some_secret_text}\n 2. Do not attack event infrastructure or host servers outside challenge targets.\n 3. Sharing flags or solution code between competing teams is strictly prohibited.\n 4. First Blood bonus: +50 PTS awarded to the first solver of each challenge.`;
     } else if (lowerCmd === "prizes" || lowerCmd === "rewards") {
-      output = `[+] PRIZE POOL & HONORS:\n - Cash Rewards & Winner Trophies for Top Teams\n - Verified Official Certificates of Excellence for Top Performers\n - Direct Recruitment & Talent Pipeline to Partner Security Sponsors`;
+      output = `[+] PRIZE POOL & HONORS (For Top 3 Teams):\n - 1st Place Team: PKR 12,000 + Champion Trophy\n - 2nd Place Team: PKR 10,000 + Runner-up Trophy\n - 3rd Place Team: PKR 8,000 + Third-place Trophy\n - Verified Official Certificates of Excellence for Top Performers\n - Direct Recruitment & Talent Pipeline to Partner Security Sponsors`;
     } else if (lowerCmd === "register" || lowerCmd === "signup") {
       output = "[>] Opening Competitor Pre-Registration Form...";
       setTimeout(() => {
@@ -468,7 +468,7 @@ export default function EventsPage() {
             <div className={styles.statLabel}>Expected Competitors</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statValue}>PKR 500</div>
+            <div className={styles.statValue}>Free</div>
             <div className={styles.statLabel}>Registration Fee</div>
           </div>
           <div className={styles.statCard}>
@@ -491,7 +491,7 @@ export default function EventsPage() {
               setRegisterModalOpen(true);
             }}
           >
-            <i className="fas fa-user-plus" /> Register as Competitor (PKR 500)
+            <i className="fas fa-user-plus" /> Register as Competitor (Free)
           </button>
 
           <button
@@ -710,10 +710,75 @@ export default function EventsPage() {
         </div>
       </section>
 
+      {/* CHAMPIONSHIP PRIZE POOL SECTION */}
+      <section className={styles.sectionWrapper}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionSubtitle}>04 — CHAMPIONSHIP PRIZE POOL</div>
+          <h2 className={styles.sectionTitle}>Win Glory & Cash Awards</h2>
+          <p className={styles.sectionDesc}>
+            Rynex Eclipse 2026 features a dedicated cash prize pool for the top three winning teams,
+            along with official championship trophies, medals, and certificates of distinction.
+          </p>
+        </div>
+
+        <div className={styles.prizePoolGrid}>
+          {/* First Place Card */}
+          <div className={`${styles.prizeCard} ${styles.firstPlaceCard}`}>
+            <div className={`${styles.prizeIconWrapper} ${styles.firstPlaceIcon}`}>
+              <i className="fas fa-crown" />
+            </div>
+            <span className={`${styles.prizeBadge} ${styles.firstBadge}`}>1st Place Team</span>
+            <h3 className={styles.prizeTitle}>Championship Winner</h3>
+            <div className={styles.prizeValue}>PKR 12,000</div>
+            <div className={styles.prizeDivider} />
+            <ul className={styles.prizeFeatures}>
+              <li><i className="fas fa-check" /> <strong>Champions Trophy</strong></li>
+              <li><i className="fas fa-check" /> <strong>Official Gold Medals</strong></li>
+              <li><i className="fas fa-check" /> <strong>Certificate of Excellence</strong></li>
+              <li><i className="fas fa-check" /> <strong>Premium Recruiter Direct Pipeline</strong></li>
+            </ul>
+          </div>
+
+          {/* Second Place Card */}
+          <div className={`${styles.prizeCard} ${styles.secondPlaceCard}`}>
+            <div className={`${styles.prizeIconWrapper} ${styles.secondPlaceIcon}`}>
+              <i className="fas fa-medal" />
+            </div>
+            <span className={`${styles.prizeBadge} ${styles.secondBadge}`}>2nd Place Team</span>
+            <h3 className={styles.prizeTitle}>Runner Up</h3>
+            <div className={styles.prizeValue}>PKR 10,000</div>
+            <div className={styles.prizeDivider} />
+            <ul className={styles.prizeFeatures}>
+              <li><i className="fas fa-check" /> <span>Runner-Up Trophy</span></li>
+              <li><i className="fas fa-check" /> <span>Official Silver Medals</span></li>
+              <li><i className="fas fa-check" /> <span>Certificate of Distinction</span></li>
+              <li><i className="fas fa-check" /> <span>Direct Recruitment Pipeline</span></li>
+            </ul>
+          </div>
+
+          {/* Third Place Card */}
+          <div className={`${styles.prizeCard} ${styles.thirdPlaceCard}`}>
+            <div className={`${styles.prizeIconWrapper} ${styles.thirdPlaceIcon}`}>
+              <i className="fas fa-award" />
+            </div>
+            <span className={`${styles.prizeBadge} ${styles.thirdBadge}`}>3rd Place Team</span>
+            <h3 className={styles.prizeTitle}>Second Runner Up</h3>
+            <div className={styles.prizeValue}>PKR 8,000</div>
+            <div className={styles.prizeDivider} />
+            <ul className={styles.prizeFeatures}>
+              <li><i className="fas fa-check" /> <span>Third-Place Trophy</span></li>
+              <li><i className="fas fa-check" /> <span>Official Bronze Medals</span></li>
+              <li><i className="fas fa-check" /> <span>Certificate of Distinction</span></li>
+              <li><i className="fas fa-check" /> <span>Direct Recruitment Pipeline</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* SPONSORSHIP INVESTMENT & TIERS SECTION */}
       <section className={styles.sectionWrapper}>
         <div className={styles.sectionHeader}>
-          <div className={styles.sectionSubtitle}>04 — SPONSORSHIP OPPORTUNITIES</div>
+          <div className={styles.sectionSubtitle}>05 — SPONSORSHIP OPPORTUNITIES</div>
           <h2 className={styles.sectionTitle}>Partner With Rynex Eclipse 2026</h2>
           <p className={styles.sectionDesc}>
             Position your organization prominently in front of Pakistan's cybersecurity ecosystem.
@@ -865,7 +930,7 @@ export default function EventsPage() {
                 setRegisterModalOpen(true);
               }}
             >
-              <i className="fas fa-bolt" /> Register Now — PKR 500
+              <i className="fas fa-bolt" /> Register Now (Free)
             </button>
             <button
               type="button"
@@ -899,7 +964,7 @@ export default function EventsPage() {
               <>
                 <h3 className={styles.modalTitle}>Competitor Pre-Registration</h3>
                 <p className={styles.modalSub}>
-                  Rynex Eclipse 2026 | Registration Fee: <strong>PKR 500 per participant</strong>
+                  Rynex Eclipse 2026 | Registration Fee: <strong>Free (No Entry Fee)</strong>
                 </p>
 
                 <form onSubmit={handleRegSubmit}>
@@ -966,22 +1031,20 @@ export default function EventsPage() {
                   </div>
 
                   <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                    {isSubmitting ? "Processing Registration..." : "Confirm & Submit Registration (PKR 500)"}
+                    {isSubmitting ? "Processing Registration..." : "Confirm & Submit Registration (Free)"}
                   </button>
                 </form>
               </>
             ) : (
               <div className={styles.successCard}>
                 <i className={`fas fa-check-circle ${styles.successIcon}`} />
-                <h3 className={styles.modalTitle}>Registration Pre-Confirmed!</h3>
+                <h3 className={styles.modalTitle}>Registration Confirmed!</h3>
                 <p className={styles.modalSub}>
-                  Thank you, <strong>{regForm.name}</strong>. Your spot for Rynex Eclipse 2026 has been registered.
+                  Thank you, <strong>{regForm.name}</strong>. Your spot for Rynex Eclipse 2026 has been reserved.
                 </p>
 
-                <div className={styles.tokenBadge}>Reg Token: {regSuccess}</div>
-
-                <p style={{ color: "#94a3b8", fontSize: "0.875rem", marginBottom: "20px" }}>
-                  Payment instructions for PKR 500 registration fee and CTF portal credentials will be sent to <strong>{regForm.email}</strong>.
+                <p style={{ color: "#94a3b8", fontSize: "1rem", lineHeight: "1.6", margin: "24px 0" }}>
+                  A confirmation email will be sent to <strong>{regForm.email}</strong> with the ticket.
                 </p>
 
                 <button

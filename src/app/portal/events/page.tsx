@@ -25,10 +25,34 @@ export default function PortalEventsPage() {
   const [filterType, setFilterType] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSubmission, setSelectedSubmission] = useState<EventSubmission | null>(null);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubmissions();
   }, []);
+
+  const handleResendEmail = async (id: string, email: string) => {
+    setSendingEmailId(id);
+    try {
+      const res = await fetch("/api/portal/events", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, resend: true }),
+      });
+      if (res.ok) {
+        setToastMsg(`✓ Confirmation email sent to ${email} & copy sent to info@rynexsecurity.com!`);
+        setTimeout(() => setToastMsg(null), 5000);
+      } else {
+        alert("Failed to send email. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error sending email.");
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
 
   const fetchSubmissions = async () => {
     setLoading(true);
@@ -311,7 +335,7 @@ export default function PortalEventsPage() {
                       >
                         <option value="PENDING">PENDING</option>
                         <option value="CONTACTED">CONTACTED</option>
-                        <option value="CONFIRMED">CONFIRMED</option>
+                        <option value="CONFIRMED">CONFIRMED (Approve & Send Ticket)</option>
                         <option value="CANCELLED">CANCELLED</option>
                       </select>
                     </td>
@@ -321,6 +345,25 @@ export default function PortalEventsPage() {
                     </td>
 
                     <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                      {item.status !== "CONFIRMED" && (
+                        <button
+                          type="button"
+                          onClick={() => handleStatusChange(item.id, "CONFIRMED")}
+                          style={{
+                            background: "rgba(16, 185, 129, 0.15)",
+                            border: "1px solid #10b981",
+                            color: "#10b981",
+                            padding: "4px 10px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "0.8rem",
+                            marginRight: "6px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Approve & Send Ticket
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => setSelectedSubmission(item)}
@@ -434,9 +477,42 @@ export default function PortalEventsPage() {
               </div>
             )}
 
+            {toastMsg && (
+              <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid #10b981", color: "#10b981", padding: "10px 14px", borderRadius: "6px", fontSize: "0.85rem", marginBottom: "16px", fontWeight: 600 }}>
+                {toastMsg}
+              </div>
+            )}
+
+            {selectedSubmission.status !== "CONFIRMED" && (
+              <button
+                type="button"
+                onClick={() => handleStatusChange(selectedSubmission.id, "CONFIRMED")}
+                style={{
+                  width: "100%",
+                  background: "#10b981",
+                  color: "#ffffff",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "none",
+                  marginBottom: "12px",
+                  fontSize: "0.9rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
+                <i className="fas fa-ticket" /> Confirm & Issue Graphic Ticket
+              </button>
+            )}
+
             <div style={{ display: "flex", gap: "12px" }}>
-              <a
-                href={`mailto:${selectedSubmission.email}?subject=Rynex Eclipse 2026 Submission Follow-up&body=Hi ${selectedSubmission.name},`}
+              <button
+                type="button"
+                disabled={sendingEmailId === selectedSubmission.id}
+                onClick={() => handleResendEmail(selectedSubmission.id, selectedSubmission.email)}
                 style={{
                   flex: 1,
                   background: "#00d4ff",
@@ -444,13 +520,18 @@ export default function PortalEventsPage() {
                   padding: "10px",
                   borderRadius: "6px",
                   fontWeight: 700,
-                  textAlign: "center",
-                  textDecoration: "none",
+                  border: "none",
+                  cursor: sendingEmailId === selectedSubmission.id ? "not-allowed" : "pointer",
                   fontSize: "0.9rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
                 }}
               >
-                <i className="fas fa-envelope" /> Send Email
-              </a>
+                <i className="fas fa-paper-plane" />
+                {sendingEmailId === selectedSubmission.id ? "Sending Email..." : "Send / Resend Ticket Email"}
+              </button>
 
               <a
                 href={`tel:${selectedSubmission.phone}`}

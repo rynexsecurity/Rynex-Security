@@ -13,16 +13,48 @@ interface SendEmailOptions {
   html: string;
 }
 
+import nodemailer from "nodemailer";
+
 async function sendEmail({ to, subject, html }: SendEmailOptions) {
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const port = parseInt(process.env.SMTP_PORT || "587", 10);
+      const secure = process.env.SMTP_SECURE === "true" || port === 465;
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port,
+        secure,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const info = await transporter.sendMail({
+        from: `"${FROM_NAME}" <${process.env.SMTP_FROM || FROM_EMAIL}>`,
+        to,
+        subject,
+        html,
+      });
+
+      console.log(`[Portal Mailer] SMTP email sent to ${to}:`, info.messageId);
+      return;
+    } catch (smtpErr: any) {
+      console.error(`[Portal Mailer] SMTP send to ${to} failed:`, smtpErr?.message || smtpErr);
+    }
+  }
+
   try {
-    await client.send({
+    const res = await client.send({
       from: { email: FROM_EMAIL, name: FROM_NAME },
       to: [{ email: to }],
       subject,
       html,
     });
-  } catch (error) {
-    console.error("[Portal Mailer] Failed to send email:", error);
+    console.log(`[Portal Mailer] Email sent to ${to}:`, JSON.stringify(res));
+  } catch (error: any) {
+    console.error(`[Portal Mailer] Failed to send email to ${to} with ${FROM_EMAIL}:`, error?.message || error);
   }
 }
 
