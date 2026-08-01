@@ -52,7 +52,7 @@ export default async function BlogPostPage({
             })}
           </p>
           <h1 className={styles.postDetailTitle}>{post.title}</h1>
-          
+
           {post.author && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', marginBottom: '1.5rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: '#000' }}>
@@ -64,7 +64,7 @@ export default async function BlogPostPage({
               </div>
             </div>
           )}
-          
+
           {post.coverImage && (
             <div style={{ marginBottom: '2rem', borderRadius: '0.75rem', overflow: 'hidden' }}>
               <img src={post.coverImage} alt={post.title} style={{ width: '100%', height: 'auto', display: 'block' }} />

@@ -61,7 +61,7 @@ export default function EventPopup() {
           <div className={styles.statDivider} aria-hidden="true" />
           <div className={styles.stat}>
             <i className="fas fa-ticket" aria-hidden="true" />
-            <span>PKR 500</span>
+            <span>FREE</span>
           </div>
         </div>
 
@@ -75,10 +75,10 @@ export default function EventPopup() {
         {/* Challenge tracks mini-grid */}
         <div className={styles.tracksGrid}>
           {[
-            { icon: 'fa-globe',          label: 'Web Exploitation' },
+            { icon: 'fa-globe', label: 'Web Exploitation' },
             { icon: 'fa-magnifying-glass', label: 'Digital Forensics' },
-            { icon: 'fa-gears',          label: 'Reverse Engineering' },
-            { icon: 'fa-network-wired',  label: 'Network Security' },
+            { icon: 'fa-gears', label: 'Reverse Engineering' },
+            { icon: 'fa-network-wired', label: 'Network Security' },
           ].map(t => (
             <div key={t.label} className={styles.track}>
               <i className={`fas ${t.icon}`} aria-hidden="true" />

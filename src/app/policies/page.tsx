@@ -35,18 +35,6 @@ export default function PoliciesPage() {
               <i className="fas fa-building" aria-hidden="true" />
               Rynex Security
             </span>
-            <span>
-              <i className="fas fa-user-shield" aria-hidden="true" />
-              Owner: CISO &amp; MD
-            </span>
-            <span>
-              <i className="fas fa-code-branch" aria-hidden="true" />
-              Version 1.0
-            </span>
-            <span>
-              <i className="fas fa-calendar" aria-hidden="true" />
-              2026-07
-            </span>
           </div>
         </div>
       </div>
@@ -347,23 +335,6 @@ export default function PoliciesPage() {
           </p>
         </div>
       </section>
-
-      {/* ─── Contact Bar ─── */}
-      <div className={styles.contactBar}>
-        <div className={styles.contactBarInner}>
-          <p className={styles.contactBarTitle}>Corporate Contact</p>
-          <div className={styles.contactBarLinks}>
-            <a href="https://www.rynexsecurity.com" className={styles.contactLink}>
-              <i className="fas fa-globe" aria-hidden="true" />
-              www.rynexsecurity.com
-            </a>
-            <a href="mailto:info@rynexsecurity.com" className={styles.contactLink}>
-              <i className="fas fa-envelope" aria-hidden="true" />
-              info@rynexsecurity.com
-            </a>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

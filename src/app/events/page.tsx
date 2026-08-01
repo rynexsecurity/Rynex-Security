@@ -468,7 +468,7 @@ export default function EventsPage() {
             <div className={styles.statLabel}>Expected Competitors</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statValue}>PKR 500</div>
+            <div className={styles.statValue}>FREE</div>
             <div className={styles.statLabel}>Registration Fee</div>
           </div>
           <div className={styles.statCard}>
@@ -491,7 +491,7 @@ export default function EventsPage() {
               setRegisterModalOpen(true);
             }}
           >
-            <i className="fas fa-user-plus" /> Register as Competitor (PKR 500)
+            <i className="fas fa-user-plus" /> Register as Competitor (Free)
           </button>
 
           <button
