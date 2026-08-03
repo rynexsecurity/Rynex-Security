@@ -3,67 +3,122 @@ import type { NextRequest } from 'next/server';
 import { verifyEdgeJWT } from './lib/auth-edge';
 
 function isTrustedVercelPreviewHost(hostname: string): boolean {
-  // Vercel supplies both a unique deployment URL and a branch URL at runtime.
-  // Exact matching avoids treating arbitrary *.vercel.app Host headers as portal hosts.
-  if (process.env.VERCEL_ENV !== 'preview') return false;
-  const trustedHosts = [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+  if (process.env.VERCEL_ENV !== 'preview') {
+    return false;
+  }
+
+  const trustedHosts = [
+    process.env.VERCEL_URL,
+    process.env.VERCEL_BRANCH_URL,
+  ]
     .filter((value): value is string => Boolean(value))
-    .map((value) => value.toLowerCase());
+    .map((value) =>
+      value
+        .replace(/^https?:\/\//, '')
+        .replace(/\/$/, '')
+        .toLowerCase(),
+    );
+
   return trustedHosts.includes(hostname);
+}
+
+function isPortalPath(pathname: string): boolean {
+  return pathname === '/portal' || pathname.startsWith('/portal/');
+}
+
+async function getPortalSession(request: NextRequest) {
+  const sessionCookie = request.cookies.get('portal_session')?.value;
+
+  if (!sessionCookie) {
+    return null;
+  }
+
+  return verifyEdgeJWT(sessionCookie);
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
-
-  // Get clean hostname (e.g. portal.localhost:3000 -> portal.localhost)
   const currentHost = hostname.split(':')[0].toLowerCase();
 
-  // Check if subdomain is "portal"
-  const isPortalSubdomain =
+  const isProductionPortalHost =
     currentHost === 'portal.rynexsecurity.com' ||
-    currentHost === 'portal.localhost' ||
-    isTrustedVercelPreviewHost(currentHost);
+    currentHost === 'portal.localhost';
 
-  if (isPortalSubdomain) {
-    // Prevent duplicate paths if user types portal.rynexsecurity.com/portal/login
+  const isPreviewHost = isTrustedVercelPreviewHost(currentHost);
+
+  /*
+   * Production portal subdomain:
+   *
+   * portal.rynexsecurity.com/login
+   * portal.rynexsecurity.com/dashboard
+   *
+   * These are internally rewritten to /portal/*
+   */
+  if (isProductionPortalHost) {
     let cleanPathname = pathname;
-    if (pathname.startsWith('/portal')) {
-      cleanPathname = pathname.replace('/portal', '') || '/';
+
+    if (isPortalPath(pathname)) {
+      cleanPathname = pathname.slice('/portal'.length) || '/';
     }
 
-    const sessionCookie = request.cookies.get('portal_session')?.value;
+    const decodedSession = await getPortalSession(request);
     const isLoginPage = cleanPathname === '/login';
-    const isChangePasswordPage = cleanPathname === '/change-password';
 
-    // Verify Session
-    let decodedSession = null;
-    if (sessionCookie) {
-      decodedSession = await verifyEdgeJWT(sessionCookie);
-    }
-
-    // Auth redirection check
-    // 1. If on login and already authenticated -> redirect to dashboard
     if (isLoginPage && decodedSession) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    // 2. If not authenticated and not on login page -> redirect to login
     if (!isLoginPage && !decodedSession) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-
-    // Rewrite requests to map silently into /src/app/portal/* directory
     const url = request.nextUrl.clone();
     url.pathname = `/portal${cleanPathname}`;
+
     return NextResponse.rewrite(url);
   }
 
-  // Protect against main domain /portal access: return 404 page (no redirection)
-  if (pathname.startsWith('/portal')) {
+  /*
+   * Vercel Preview:
+   *
+   * Public website stays public:
+   * /events
+   * /blog
+   * /about
+   *
+   * Portal remains available under:
+   * /portal/login
+   * /portal/dashboard
+   */
+  if (isPreviewHost && isPortalPath(pathname)) {
+    const portalPath = pathname.slice('/portal'.length) || '/';
+    const decodedSession = await getPortalSession(request);
+    const isLoginPage = portalPath === '/login';
+
+    if (isLoginPage && decodedSession) {
+      return NextResponse.redirect(
+        new URL('/portal/dashboard', request.url),
+      );
+    }
+
+    if (!isLoginPage && !decodedSession) {
+      return NextResponse.redirect(
+        new URL('/portal/login', request.url),
+      );
+    }
+
+    return NextResponse.next();
+  }
+
+  /*
+   * Block /portal access on the normal production website domain.
+   * This does not apply to trusted Vercel Preview deployments.
+   */
+  if (isPortalPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = '/not-found';
+
     return NextResponse.rewrite(url);
   }
 
@@ -71,6 +126,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Matches all paths except static files, favicon, API, and image assets
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images).*)'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|images).*)',
+  ],
 };
