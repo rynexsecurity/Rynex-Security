@@ -3,12 +3,13 @@ import type { NextRequest } from 'next/server';
 import { verifyEdgeJWT } from './lib/auth-edge';
 
 function isTrustedVercelPreviewHost(hostname: string): boolean {
-  // VERCEL_URL is injected by Vercel for the current deployment. Matching it
-  // exactly avoids treating arbitrary *.vercel.app Host headers as portal hosts.
-  const deploymentHost = process.env.VERCEL_ENV === 'preview'
-    ? process.env.VERCEL_URL?.toLowerCase()
-    : undefined;
-  return Boolean(deploymentHost && hostname === deploymentHost);
+  // Vercel supplies both a unique deployment URL and a branch URL at runtime.
+  // Exact matching avoids treating arbitrary *.vercel.app Host headers as portal hosts.
+  if (process.env.VERCEL_ENV !== 'preview') return false;
+  const trustedHosts = [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+    .filter((value): value is string => Boolean(value))
+    .map((value) => value.toLowerCase());
+  return trustedHosts.includes(hostname);
 }
 
 export async function middleware(request: NextRequest) {
