@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/portal/prisma";
 import { createSession, createSessionCookie } from "@/lib/portal/auth";
@@ -7,6 +8,13 @@ import { hashPassword, needsRehash } from "@/lib/password";
 
 const DUMMY_HASH = "$2a$12$LQv3c1yqYF4nHhzKmR1uP.3aH2Akgv4Nhi17JvfHq1IC2dVGYG8wW";
 const invalid = () => NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+
+function loginErrorCategory(error: unknown): string {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) return `prisma_known_${error.code}`;
+  if (error instanceof Prisma.PrismaClientInitializationError) return "prisma_initialization";
+  if (error instanceof Error && error.message === "JWT_SECRET must be a non-placeholder secret of at least 32 characters") return "jwt_secret_invalid";
+  return "unexpected";
+}
 
 export async function handleLogin(request: Request) {
   const body = await readStrictJson(request, 4096);
@@ -28,7 +36,7 @@ export async function handleLogin(request: Request) {
     return response;
   } catch (error) {
     console.error("[portal-auth] login failed", {
-      errorName: error instanceof Error ? error.name : "UnknownError",
+      category: loginErrorCategory(error),
     });
     return NextResponse.json({ error: "Unable to sign in." }, { status: 500 });
   }
