@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
 import { getSessionUser } from '@/lib/auth';
+import { hasOnlyKeys, readStrictJson } from '@/lib/security';
 
 export async function GET() {
   try {
@@ -57,11 +58,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { userId } = session;
+    const { userId, role } = session;
 
-    const { title, slug, excerpt, content, tags, metaDescription, canonicalUrl, focusKeyphrase, coverImage } = await request.json();
+    if (!['CEO', 'ADMIN', 'DIRECTOR', 'HEAD'].includes(role)) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+    }
 
-    if (!title || !slug || !content) {
+    const body = await readStrictJson(request, 120_000);
+    if (!body || !hasOnlyKeys(body, ['title', 'slug', 'excerpt', 'content', 'tags', 'metaDescription', 'canonicalUrl', 'focusKeyphrase', 'coverImage'])) return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
+    const { title, slug, excerpt, content, tags, metaDescription, canonicalUrl, focusKeyphrase, coverImage } = body;
+
+    if (typeof title !== 'string' || typeof slug !== 'string' || typeof content !== 'string' || title.length > 200 || slug.length > 160 || content.length > 100_000 || !title.trim() || !slug.trim() || !content.trim() || !Array.isArray(tags) || tags.length > 20 || !tags.every((tag) => typeof tag === 'string' && tag.length <= 50)) {
       return NextResponse.json(
         { error: 'Title, slug, and content are required' },
         { status: 400 }
@@ -79,15 +86,15 @@ export async function POST(request: Request) {
 
     const newBlog = await db.blogPost.create({
       data: {
-        title,
-        slug,
-        excerpt,
+        title: title.trim(),
+        slug: slug.trim(),
+        excerpt: typeof excerpt === 'string' ? excerpt.slice(0, 500) : null,
         content,
-        tags: tags || [],
-        metaDescription,
-        canonicalUrl,
-        focusKeyphrase,
-        coverImage,
+        tags,
+        metaDescription: typeof metaDescription === 'string' ? metaDescription.slice(0, 320) : null,
+        canonicalUrl: typeof canonicalUrl === 'string' && /^https:\/\//.test(canonicalUrl) ? canonicalUrl.slice(0, 2000) : null,
+        focusKeyphrase: typeof focusKeyphrase === 'string' ? focusKeyphrase.slice(0, 200) : null,
+        coverImage: typeof coverImage === 'string' && /^https:\/\//.test(coverImage) ? coverImage.slice(0, 2000) : null,
         authorId: userId,
         status: 'PENDING',
       },

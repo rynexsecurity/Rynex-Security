@@ -5,6 +5,7 @@ import {
   sendTeamNotification,
 } from "@/lib/mailer";
 import { validateEmail } from "@/lib/email-validator";
+import { enforceRateLimit, sourceKey, tooManyRequests } from "@/lib/security";
 
 const INQUIRY_LABELS: Record<string, string> = {
   general: "General Inquiry",
@@ -17,6 +18,7 @@ const INQUIRY_LABELS: Record<string, string> = {
 type JsonRecord = Record<string, unknown>;
 
 export async function POST(req: Request) {
+  if (!(await enforceRateLimit("contact:global", "all", 100, 60 * 60_000)) || !(await enforceRateLimit("contact:source", sourceKey(req), 5, 60 * 60_000))) return tooManyRequests();
   let body: unknown;
 
   try {

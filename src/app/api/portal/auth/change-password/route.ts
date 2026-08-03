@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/portal/prisma";
-import { getSession, signJWT, createSessionCookie } from "@/lib/portal/auth";
+import { getSession, signJWT, createSessionCookie, revokeUserSessions } from "@/lib/portal/auth";
+import { validatePassword } from "@/lib/password";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,9 +20,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (newPassword.length < 8) {
+    if (typeof currentPassword !== "string" || typeof newPassword !== "string" || validatePassword(newPassword, [session.email, session.name])) {
       return NextResponse.json(
-        { error: "New password must be at least 8 characters." },
+        { error: "Password does not meet security requirements." },
         { status: 400 }
       );
     }
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
       where: { id: user.id },
       data: { passwordHash: newHash, mustChangePassword: false },
     });
+    await revokeUserSessions(user.id, session.sid);
 
     // Audit log
     await prisma.auditLog.create({
@@ -67,6 +69,7 @@ export async function POST(req: NextRequest) {
       role: user.role,
       name: user.name,
       mustChangePassword: false,
+      sid: session.sid,
     });
 
     const response = NextResponse.json({ success: true });

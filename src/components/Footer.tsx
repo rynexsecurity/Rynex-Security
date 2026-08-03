@@ -42,10 +42,10 @@ export default function Footer() {
                 <li><Link href="/blog">Blog</Link></li>
               </ul>
               <ul className={styles.linksList}>
+                <li><Link href="/events">Events</Link></li>
                 <li><Link href="/careers">Careers</Link></li>
                 <li><Link href="/internship">Internship</Link></li>
                 <li><Link href="/contact">Contact Us</Link></li>
-                <li><Link href="/policies">Privacy Policy</Link></li>
               </ul>
             </div>
           </div>

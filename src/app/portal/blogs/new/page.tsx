@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from '../blogForm.module.css';
@@ -23,6 +23,33 @@ export default function NewBlogPage() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/portal/auth/me');
+        if (!res.ok) {
+          router.replace('/portal/login');
+          return;
+        }
+        const data = await res.json();
+        const role = data.user?.role;
+        if (role === 'INTERN' || role === 'CLIENT') {
+          setAuthorized(false);
+        } else {
+          setAuthorized(true);
+        }
+      } catch (err) {
+        console.error(err);
+        router.replace('/portal/blogs');
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
 
   const generateSlug = (text: string) => {
     return text
@@ -73,6 +100,28 @@ export default function NewBlogPage() {
       setLoading(false);
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <div className={styles.container} style={{ textAlign: 'center', padding: '4rem', color: 'var(--portal-accent)' }}>
+        Checking permissions...
+      </div>
+    );
+  }
+
+  if (!authorized) {
+    return (
+      <div className={styles.container} style={{ textAlign: 'center', padding: '4rem' }}>
+        <h1 style={{ color: 'var(--status-danger)', fontSize: '24px', marginBottom: '1rem', fontWeight: 700 }}>Access Denied</h1>
+        <p style={{ color: 'var(--portal-text-secondary)', marginBottom: '2.5rem', fontSize: '14px' }}>
+          Your account role is not permitted to create or publish blogs.
+        </p>
+        <Link href="/portal/blogs" className={styles.cancelBtn} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.25rem', textDecoration: 'none' }}>
+          <i className="fas fa-arrow-left" /> Back to Blogs List
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>

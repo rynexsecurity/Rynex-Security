@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import { SafeMarkdown } from "@/components/SafeMarkdown";
 import type { Metadata } from "next";
 import { getAllPosts, getPostBySlug } from "@/lib/posts";
 import styles from "../blog.module.css";
@@ -78,7 +78,7 @@ export default async function BlogPostPage({
           </div>
         </div>
         <article className={styles.article}>
-          <MDXRemote source={post.content} />
+          <SafeMarkdown source={post.content} />
         </article>
       </div>
     </section>

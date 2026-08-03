@@ -4,10 +4,12 @@ import {
   sendInternshipConfirmationEmail,
   sendTeamNotification,
 } from "@/lib/mailer";
+import { enforceRateLimit, sourceKey, tooManyRequests } from "@/lib/security";
 
 type JsonRecord = Record<string, unknown>;
 
 export async function POST(req: Request) {
+  if (!(await enforceRateLimit("internship:global", "all", 50, 60 * 60_000)) || !(await enforceRateLimit("internship:source", sourceKey(req), 3, 60 * 60_000))) return tooManyRequests();
   let body: unknown;
 
   try {

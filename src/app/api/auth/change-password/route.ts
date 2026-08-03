@@ -2,15 +2,16 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
 import { signJWT, verifyJWT } from '@/lib/auth';
-import { comparePassword, hashPassword } from '@/lib/password';
+import { comparePassword, hashPassword, validatePassword } from '@/lib/password';
+import { revokeUserSessions } from '@/lib/portal/auth';
 
 export async function POST(request: Request) {
   try {
     const { currentPassword, newPassword } = await request.json();
 
-    if (!currentPassword || !newPassword) {
+    if (typeof currentPassword !== 'string' || typeof newPassword !== 'string' || validatePassword(newPassword)) {
       return NextResponse.json(
-        { error: 'Current password and new password are required' },
+        { error: 'Password does not meet security requirements.' },
         { status: 400 }
       );
     }
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
         mustChangePassword: false,
       },
     });
+    await revokeUserSessions(userId, decoded.sid);
 
     // Create new session token with updated mustChangePassword
     const token = await signJWT({
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
       email: updatedUser.email,
       role: updatedUser.role,
       mustChangePassword: false,
+      sid: decoded.sid,
     });
 
     // Update session cookie

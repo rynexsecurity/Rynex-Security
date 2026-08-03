@@ -30,7 +30,7 @@ export default function UsersPage() {
   const [teams, setTeams] = useState<TeamData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Filters
   const [search, setSearch] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
@@ -49,6 +49,8 @@ export default function UsersPage() {
   const [department, setDepartment] = useState('TECHNICAL');
   const [teamId, setTeamId] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -186,15 +188,15 @@ export default function UsersPage() {
     if (!confirm(`Are you sure you want to permanently delete user ${userName}? This action cannot be undone.`)) {
       return;
     }
-    
+
     try {
       const res = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete user');
-      
+
       await fetchData();
     } catch (err: any) {
       alert(err.message || 'Error deleting user');
@@ -373,7 +375,7 @@ export default function UsersPage() {
                 <i className="fas fa-times" aria-hidden="true"></i>
               </button>
             </div>
-            
+
             {submitError && <div className={styles.modalError}>{submitError}</div>}
 
             <form onSubmit={handleCreateUser} className={styles.modalForm}>
@@ -449,14 +451,26 @@ export default function UsersPage() {
 
               <div className={styles.formGroup}>
                 <label className={styles.modalLabel}>Temporary Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={styles.modalInput}
-                  placeholder="Minimum 8 characters"
-                  required
-                />
+                <div className={styles.inputWrap}>
+                  <input
+                    type={showCreatePassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={styles.modalInput}
+                    placeholder="Minimum 8 characters"
+                    required
+                    style={{ paddingRight: '2.5rem' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCreatePassword(!showCreatePassword)}
+                    className={styles.eyeBtn}
+                    disabled={submitLoading}
+                    aria-label={showCreatePassword ? 'Hide password' : 'Show password'}
+                  >
+                    <i className={`fas ${showCreatePassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
 
               <div className={styles.modalActions}>
@@ -491,20 +505,32 @@ export default function UsersPage() {
                 <i className="fas fa-times" aria-hidden="true"></i>
               </button>
             </div>
-            
+
             {submitError && <div className={styles.modalError}>{submitError}</div>}
 
             <form onSubmit={handleResetPassword} className={styles.modalForm}>
               <div className={styles.formGroup}>
                 <label className={styles.modalLabel}>New Temporary Password</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className={styles.modalInput}
-                  placeholder="Enter new password"
-                  required
-                />
+                <div className={styles.inputWrap}>
+                  <input
+                    type={showResetPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className={styles.modalInput}
+                    placeholder="Enter new password"
+                    required
+                    style={{ paddingRight: '2.5rem' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                    className={styles.eyeBtn}
+                    disabled={submitLoading}
+                    aria-label={showResetPassword ? 'Hide password' : 'Show password'}
+                  >
+                    <i className={`fas ${showResetPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
 
               <div className={styles.modalActions}>
