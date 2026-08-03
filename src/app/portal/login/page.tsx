@@ -5,6 +5,16 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.css';
 
+type LoginResponse = {
+  error?: string;
+  requestedIp?: string;
+  user?: { name: string; email: string; role: string };
+};
+
+function isLoginResponse(value: unknown): value is LoginResponse {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,13 +32,21 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/portal/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data: LoginResponse = {};
+      if (res.headers.get('content-type')?.toLowerCase().includes('application/json')) {
+        try {
+          const parsed: unknown = await res.json();
+          data = isLoginResponse(parsed) ? parsed : {};
+        } catch {
+          data = {};
+        }
+      }
 
       if (res.status === 403 && data.error === 'IP_NOT_AUTHORIZED') {
         setIpBlocked({ ip: data.requestedIp || 'unknown' });
@@ -37,8 +55,10 @@ export default function LoginPage() {
       }
 
       if (!res.ok) {
-        throw new Error(data.error || 'Invalid credentials');
+        throw new Error(res.status === 401 ? 'Invalid email or password.' : 'Unable to sign in. Please try again.');
       }
+
+      if (!data.user) throw new Error('Unable to sign in. Please try again.');
 
       setLoggedUser(data.user);
       setShowSuccessPopup(true);
@@ -47,8 +67,8 @@ export default function LoginPage() {
         router.push('/portal/dashboard');
         router.refresh();
       }, 1800);
-    } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unable to sign in. Please try again.');
       setLoading(false);
     }
   };
