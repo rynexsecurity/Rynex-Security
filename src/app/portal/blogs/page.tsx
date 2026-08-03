@@ -105,10 +105,12 @@ export default function BlogsPage() {
               <span>Trash</span>
             </Link>
           )}
-          <Link href="/portal/blogs/new" className={styles.createBtn}>
-            <i className="fas fa-plus" aria-hidden="true"></i>
-            <span>Write Blog</span>
-          </Link>
+          {currentUserRole !== 'INTERN' && currentUserRole !== 'CLIENT' && (
+            <Link href="/portal/blogs/new" className={styles.createBtn}>
+              <i className="fas fa-plus" aria-hidden="true"></i>
+              <span>Write Blog</span>
+            </Link>
+          )}
         </div>
       </div>
 

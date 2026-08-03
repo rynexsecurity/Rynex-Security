@@ -202,7 +202,7 @@ export function buildEventTicketEmail(data: {
             <tr>
               <td style="color:#94a3b8; font-size:13px; line-height:1.6;">
                 <p style="margin:0 0 6px 0; color:#ffffff; font-weight:bold;">
-                  Status: Pre-Registered Competitor (FREE ENTRY)
+                  Status: Pre-Registered Competitor (PKR 500 Entry Fee)
                 </p>
                 <p style="margin:0 0 12px 0;">
                   Please keep this digital ticket for entry verification. For questions or event details, contact us at 
@@ -230,7 +230,8 @@ Category: ${category || "Competitor"}
 Date: 7 AUGUST (FRIDAY) at 10:30 AM
 Location: Khwaja Fareed University of Engineering and Information Technology (KFUEIT), Rahim Yar Khan
 
-Status: Pre-Registered Competitor (FREE ENTRY)
+Status: Pre-Registered Competitor (PKR 500 Entry Fee)
+
 
 Congratulations! Your registration for Rynex Security CTF Event has been confirmed.
 Please keep this ticket code for event entry verification.

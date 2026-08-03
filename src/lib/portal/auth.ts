@@ -1,76 +1,78 @@
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT, jwtVerify, type JWTPayload as JoseJWTPayload } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
+import prisma from "@/lib/portal/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
-const COOKIE_NAME = "portal_session";
-const MAX_AGE = 60 * 60 * 8; // 8 hours
+export const COOKIE_NAME = "portal_session";
+const MAX_AGE = 60 * 60 * 8;
+const IDLE_MS = MAX_AGE * 1000;
+const ABSOLUTE_MS = 24 * 60 * 60 * 1000;
 
-export interface JWTPayload {
+export interface PortalJWTPayload extends JoseJWTPayload {
   userId: string;
   email: string;
   role: string;
   name: string;
   mustChangePassword: boolean;
+  sid: string;
+  teamId?: string | null;
+}
+
+// `JoseJWTPayload` has an index signature, so `Omit` would widen its custom
+// properties to `unknown`. Pick keeps the pre-session fields strongly typed.
+export type PortalSessionInput = Pick<
+  PortalJWTPayload,
+  "userId" | "email" | "role" | "name" | "mustChangePassword" | "teamId"
+>;
+
+function isPortalJWTPayload(payload: JoseJWTPayload): payload is PortalJWTPayload {
+  return (
+    typeof payload.userId === "string" &&
+    typeof payload.email === "string" &&
+    typeof payload.role === "string" &&
+    typeof payload.name === "string" &&
+    typeof payload.mustChangePassword === "boolean" &&
+    typeof payload.sid === "string" &&
+    (payload.teamId === undefined || payload.teamId === null || typeof payload.teamId === "string")
+  );
 }
 
 function getSecret() {
-  if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined in environment");
-  return new TextEncoder().encode(JWT_SECRET);
-}
-
-export async function signJWT(payload: JWTPayload): Promise<string> {
-  return new SignJWT({ ...payload })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(`${MAX_AGE}s`)
-    .sign(getSecret());
-}
-
-export async function verifyJWT(token: string): Promise<JWTPayload | null> {
-  try {
-    const { payload } = await jwtVerify(token, getSecret());
-    return payload as unknown as JWTPayload;
-  } catch {
-    return null;
+  const value = process.env.JWT_SECRET?.trim();
+  if (!value || value.length < 32 || /change[-_ ]?me|example|placeholder|rynex_security_portal/i.test(value)) {
+    throw new Error("JWT_SECRET must be a non-placeholder secret of at least 32 characters");
   }
+  return new TextEncoder().encode(value);
 }
 
-export async function getSessionFromRequest(
-  req: NextRequest
-): Promise<JWTPayload | null> {
-  const token = req.cookies.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifyJWT(token);
+export async function signJWT(payload: PortalJWTPayload): Promise<string> {
+  return new SignJWT(payload).setProtectedHeader({ alg: "HS256", typ: "JWT" }).setIssuedAt().setExpirationTime(`${MAX_AGE}s`).sign(getSecret());
 }
 
-export async function getSession(): Promise<JWTPayload | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifyJWT(token);
+export async function createSession(user: PortalSessionInput, userAgent?: string | null) {
+  const now = new Date();
+  const session = await prisma.session.create({ data: { userId: user.userId, idleExpiresAt: new Date(now.getTime() + IDLE_MS), absoluteExpiresAt: new Date(now.getTime() + ABSOLUTE_MS), userAgent: userAgent?.slice(0, 256) || null } });
+  return signJWT({ ...user, sid: session.id });
 }
 
-export function createSessionCookie(token: string) {
-  return {
-    name: COOKIE_NAME,
-    value: token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    maxAge: MAX_AGE,
-    path: "/",
-  };
+export async function verifyJWT(token: string): Promise<PortalJWTPayload | null> {
+  try { const { payload } = await jwtVerify(token, getSecret(), { algorithms: ["HS256"] });
+    return isPortalJWTPayload(payload) ? payload : null;
+  } catch { return null; }
 }
 
-export function clearSessionCookie() {
-  return {
-    name: COOKIE_NAME,
-    value: "",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    maxAge: 0,
-    path: "/",
-  };
+async function activeSession(token: string): Promise<PortalJWTPayload | null> {
+  const payload = await verifyJWT(token); if (!payload) return null;
+  const now = new Date();
+  const session = await prisma.session.findUnique({ where: { id: payload.sid }, include: { user: { select: { isActive: true, role: true, mustChangePassword: true } } } });
+  if (!session || !session.user.isActive || session.revokedAt || session.idleExpiresAt <= now || session.absoluteExpiresAt <= now || session.user.role !== payload.role) return null;
+  void prisma.session.update({ where: { id: session.id }, data: { lastActiveAt: now, idleExpiresAt: new Date(Math.min(now.getTime() + IDLE_MS, session.absoluteExpiresAt.getTime())) } }).catch(() => undefined);
+  return { ...payload, mustChangePassword: session.user.mustChangePassword, role: session.user.role };
 }
+
+export async function getSessionFromRequest(req: NextRequest): Promise<PortalJWTPayload | null> { const token = req.cookies.get(COOKIE_NAME)?.value; return token ? activeSession(token) : null; }
+export async function getSession(): Promise<PortalJWTPayload | null> { const store = await cookies(); const token = store.get(COOKIE_NAME)?.value; return token ? activeSession(token) : null; }
+export async function revokeSession(sessionId: string) { await prisma.session.updateMany({ where: { id: sessionId, revokedAt: null }, data: { revokedAt: new Date() } }); }
+export async function revokeUserSessions(userId: string, exceptId?: string) { await prisma.session.updateMany({ where: { userId, revokedAt: null, ...(exceptId ? { id: { not: exceptId } } : {}) }, data: { revokedAt: new Date() } }); }
+export function createSessionCookie(token: string) { return { name: COOKIE_NAME, value: token, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, maxAge: MAX_AGE, path: "/" }; }
+export function clearSessionCookie() { return { name: COOKIE_NAME, value: "", httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, maxAge: 0, path: "/" }; }

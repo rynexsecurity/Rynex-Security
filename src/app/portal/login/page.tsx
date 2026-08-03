@@ -8,6 +8,7 @@ import styles from './login.module.css';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -202,7 +203,7 @@ export default function LoginPage() {
               <div className={styles.inputWrap}>
                 <i className={`fas fa-lock ${styles.inputIcon}`} aria-hidden="true"></i>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -211,7 +212,17 @@ export default function LoginPage() {
                   required
                   disabled={loading}
                   autoComplete="current-password"
+                  style={{ paddingRight: '2.5rem' }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.eyeBtn}
+                  disabled={loading}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                </button>
               </div>
             </div>
 

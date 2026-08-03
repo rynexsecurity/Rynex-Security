@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyJWT } from './lib/auth';
+import { verifyEdgeJWT } from './lib/auth-edge';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     // Verify Session
     let decodedSession = null;
     if (sessionCookie) {
-      decodedSession = await verifyJWT(sessionCookie);
+      decodedSession = await verifyEdgeJWT(sessionCookie);
     }
 
     // Auth redirection check

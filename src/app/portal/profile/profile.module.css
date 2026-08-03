@@ -282,3 +282,35 @@
     gap: 0.75rem;
   }
 }
+
+.inputWrap {
+  position: relative;
+  width: 100%;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--portal-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.eyeBtn:hover {
+  color: var(--portal-text-primary);
+}
+
+.eyeBtn:focus {
+  outline: none;
+  color: var(--portal-accent);
+}
+

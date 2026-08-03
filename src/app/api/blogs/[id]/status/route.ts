@@ -12,8 +12,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const cookieStore = await cookies();
     const session = await getSessionUser(cookieStore);
 
-    if (!session || !isAdmin(session.role)) {
-      return NextResponse.json({ error: 'Unauthorized or forbidden' }, { status: 403 });
+    if (!session) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+    if (!isAdmin(session.role)) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
     }
 
     const { id } = await params;

@@ -120,6 +120,46 @@ model User {
   notifications      Notification[]
   auditLogs          AuditLog[]
   blogPosts          BlogPost[]      @relation("BlogAuthor")
+  sessions           Session[]
+  popupAcknowledgements PopupAcknowledgement[]
+}
+
+model Session {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  lastActiveAt    DateTime @default(now())
+  idleExpiresAt   DateTime
+  absoluteExpiresAt DateTime
+  revokedAt       DateTime?
+  tokenVersion    Int      @default(1)
+  userAgent       String?
+  @@index([userId, revokedAt])
+}
+
+model PopupAcknowledgement {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  popupKey       String
+  popupVersion   String
+  acknowledgedAt DateTime?
+  snoozedUntil   DateTime?
+  lastShownAt    DateTime?
+  lastAction     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@unique([userId, popupKey, popupVersion])
+  @@index([userId, popupKey, popupVersion])
+}
+
+model RateLimit {
+  id        String   @id @default(uuid())
+  bucket    String   @unique
+  count     Int      @default(0)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model Team {

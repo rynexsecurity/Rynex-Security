@@ -517,3 +517,30 @@
   border-color: #F59E0B;
 }
 
+.eyeBtn {
+  position: absolute;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.eyeBtn:hover {
+  color: #4B5563;
+}
+
+.eyeBtn:focus {
+  outline: none;
+  color: #00a8cc;
+}
+
+

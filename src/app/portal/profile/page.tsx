@@ -22,6 +22,9 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -182,52 +185,88 @@ export default function ProfilePage() {
           )}
 
           <form onSubmit={handlePasswordChange} className={styles.form}>
-            <div className={styles.inputGroup}>
+             <div className={styles.inputGroup}>
               <label htmlFor="currentPassword" className={styles.label}>
                 Current Password
               </label>
-              <input
-                type="password"
-                id="currentPassword"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className={styles.input}
-                placeholder="••••••••"
-                required
-                disabled={saving}
-              />
+              <div className={styles.inputWrap}>
+                <input
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  id="currentPassword"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className={styles.input}
+                  placeholder="••••••••"
+                  required
+                  disabled={saving}
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className={styles.eyeBtn}
+                  disabled={saving}
+                  aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
+                >
+                  <i className={`fas ${showCurrentPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="newPassword" className={styles.label}>
                 New Password
               </label>
-              <input
-                type="password"
-                id="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className={styles.input}
-                placeholder="•••••••• (Min 8 characters)"
-                required
-                disabled={saving}
-              />
+              <div className={styles.inputWrap}>
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  id="newPassword"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className={styles.input}
+                  placeholder="•••••••• (Min 8 characters)"
+                  required
+                  disabled={saving}
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className={styles.eyeBtn}
+                  disabled={saving}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                >
+                  <i className={`fas ${showNewPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="confirmPassword" className={styles.label}>
                 Confirm New Password
               </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={styles.input}
-                placeholder="••••••••"
-                required
-                disabled={saving}
-              />
+              <div className={styles.inputWrap}>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={styles.input}
+                  placeholder="••••••••"
+                  required
+                  disabled={saving}
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className={styles.eyeBtn}
+                  disabled={saving}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={saving}>
