@@ -2,17 +2,27 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyEdgeJWT } from './lib/auth-edge';
 
+function isTrustedVercelPreviewHost(hostname: string): boolean {
+  // VERCEL_URL is injected by Vercel for the current deployment. Matching it
+  // exactly avoids treating arbitrary *.vercel.app Host headers as portal hosts.
+  const deploymentHost = process.env.VERCEL_ENV === 'preview'
+    ? process.env.VERCEL_URL?.toLowerCase()
+    : undefined;
+  return Boolean(deploymentHost && hostname === deploymentHost);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
 
   // Get clean hostname (e.g. portal.localhost:3000 -> portal.localhost)
-  const currentHost = hostname.split(':')[0];
+  const currentHost = hostname.split(':')[0].toLowerCase();
 
   // Check if subdomain is "portal"
   const isPortalSubdomain =
     currentHost === 'portal.rynexsecurity.com' ||
-    currentHost === 'portal.localhost';
+    currentHost === 'portal.localhost' ||
+    isTrustedVercelPreviewHost(currentHost);
 
   if (isPortalSubdomain) {
     // Prevent duplicate paths if user types portal.rynexsecurity.com/portal/login
